@@ -1,0 +1,160 @@
+.bc-body , span, h1, ul, li, img, iframe {
+	padding:0px;
+	margin:0px;
+	border:0px;
+}
+
+.bc-body {
+	background-color:#000000;
+	font-family:arial;
+	width:280px;
+	color:#ffffff;
+}
+
+#bc-header {
+	left:0;
+	top:0;
+	width:100%;
+	background-image: -webkit-linear-gradient(top, #585858, #000000);
+	vertical-align:middle;
+	border-top:1px groove;
+	border-bottom:1px groove;
+}
+
+#bc-content {
+	height:350px;
+	
+	/* 
+	   controls the size of the stripes and their offset; they have to be
+	   coordinated a certain way to ensure smooth lines
+	*/
+	background-size: 0.4em 0.4em;
+	/* 
+	   sets up the actual lines being used to create the pinstriping effect
+	*/
+    background-image: -webkit-linear-gradient(-45deg, rgba(255, 255, 255, .2) 25%, transparent 25%,
+								transparent 50%, rgba(255, 255, 255, .2) 50%, rgba(255, 255, 255, .2) 75%,
+								transparent 75%, transparent);
+}
+
+#bc-content-body {
+	position:relative;
+	margin-top:-8px;
+	margin-left:-8px;
+	top:0px;
+	left:0px;
+	width:102%;
+	height:102%;
+}
+
+#bc-footer {
+	bottom:0;
+	left:0;
+	width:100%;
+	height:35px;
+	border-top:1px groove;
+	background-image: -webkit-linear-gradient(top, #585858, #000000);
+}
+
+h1 {
+	font-size:1.2em;
+	color:#aeaeae;
+	font-weight:normal;
+}
+
+.bc-bottom-nav {
+	left:0;
+	text-align:left;
+	display:inline;
+	list-style-type:none;
+}
+
+.bc-bottom-nav li {
+	display:inline-block;
+	padding-left:10px;
+	padding-right:10px;
+	margin-right:-2px;
+	margin-left:-2px;
+	font-size:.7em;
+	color:#aeaeae;
+}
+
+.bc-bottom-nav li:hover {
+	background-image: -webkit-linear-gradient(top, #ffffff, #3181C6);
+	color:#ffffff;
+}
+
+.bc-bottom-nav img{
+	margin-left:4px;
+	float:left;
+	height:20px;
+	width:20px;
+	margin-top:3px;
+}
+
+.bc-nav-active {
+	color:#ffffff;	
+	border-radius:2px;
+	background-color:#161616;
+}
+
+ul.bc-news-list {
+	margin-left:7px;
+	display:inline-block;
+	width:95%;
+	text-align:left;
+	list-style-type:none;
+	color:#ffffff;
+}
+
+ul.bc-news-list li {
+	/*
+	background-color: #585860;
+	opacity:0.75;
+	*/
+	background: url("transparent.png") transparent 0 0;
+	min-height:40px;
+	margin:5px;
+	border:1px groove;
+	border-radius:5px;
+	vertical-align:middle;
+}
+
+ul.bc-news-list li:hover {
+	color:#69cabd;
+	border-color:#69cabd;
+}
+
+
+
+ul.bc-news-list li span {
+	position: relative;
+	top:5px;
+}
+
+ul.bc-news-list li  img {
+	margin-left:3px;
+	opacity:1.0;
+	vertical-align:middle;
+	margin-top:5px;
+}
+
+.bc-news-box {
+	display:inline-block;
+	vertical-align:middle;
+	background-color: #585860;
+	opacity:0.75;
+	width:90%;
+	min-height:40px;
+	margin:10px;
+	border: 1px groove;
+	border-radius:5px;
+}
+
+/* Profile Page */
+
+img.bc-profile-banner {
+	width:260px;
+	border-radius:2px;
+	margin-left:28px;
+}
