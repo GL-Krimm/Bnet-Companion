@@ -4,18 +4,10 @@
 		<script src='scripts/jquery.js'></script>
 		<script src='scripts/bc-interface.js'></script>
 	</head>
-<ul class='bc-news-list'>
-				<li exRef='http://www.bungie.net' >
-					<img src='images/bnet.gif' />
-					<span>Bungie.net Home Page</span>
-				</li>
-				<li exRef='http://www.bungie.net/News/Blog.aspx' >
-					<img src='images/bnet.gif' />
-					<span>Bungie.net news</span>
-				</li>
-					<li exRef='http://twitter.com/bungie' >
-					<img src='images/twitter.gif' />
-					<span>Bungie on Twitter</span>
-				</li>
-</ul>
+<ul id='bc-news' class='bc-news-list'></ul>
+	<script>
+		$(document).ready(function() {
+			window.bcInterface.getNewsFeed();
+		});
+	</script>
 </html>

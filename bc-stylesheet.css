@@ -35,16 +35,8 @@
     background-image: -webkit-linear-gradient(-45deg, rgba(255, 255, 255, .2) 25%, transparent 25%,
 								transparent 50%, rgba(255, 255, 255, .2) 50%, rgba(255, 255, 255, .2) 75%,
 								transparent 75%, transparent);
-}
+								
 
-#bc-content-body {
-	position:relative;
-	margin-top:-8px;
-	margin-left:-8px;
-	top:0px;
-	left:0px;
-	width:102%;
-	height:102%;
 }
 
 #bc-footer {
@@ -105,38 +97,39 @@ ul.bc-news-list {
 	text-align:left;
 	list-style-type:none;
 	color:#ffffff;
+	max-height:350px;
+	overflow-y:scroll;
 }
 
-ul.bc-news-list li {
+li.bc-news-item {
 	/*
 	background-color: #585860;
 	opacity:0.75;
 	*/
-	background: url("transparent.png") transparent 0 0;
-	min-height:40px;
+	background: url("images/transparent.png") transparent 0 0;
+	min-height:60px;
 	margin:5px;
 	border:1px groove;
 	border-radius:5px;
 	vertical-align:middle;
 }
 
-ul.bc-news-list li:hover {
+li.bc-news-item:hover {
 	color:#69cabd;
 	border-color:#69cabd;
 }
 
-
-
-ul.bc-news-list li span {
+li.bc-news-item span {
 	position: relative;
 	top:5px;
 }
 
-ul.bc-news-list li  img {
+li.bc-news-item img {
 	margin-left:3px;
 	opacity:1.0;
 	vertical-align:middle;
-	margin-top:5px;
+	margin-top:20px;
+	float:left;
 }
 
 .bc-news-box {
@@ -149,6 +142,27 @@ ul.bc-news-list li  img {
 	margin:10px;
 	border: 1px groove;
 	border-radius:5px;
+}
+
+ul.bc-news-details {
+	margin-left: 35px;
+	list-style-type:none;
+}
+
+ul.bc-news-details li {
+	border:none;
+	background:none;
+	min-height:0px;
+}
+
+li.bc-news-pub-date {
+	font-size:.6em;
+	color: #585860;
+	padding-bottom:5px;
+}
+
+ul.bc-news-details li  span{
+	cursor:default;
 }
 
 /* Profile Page */
