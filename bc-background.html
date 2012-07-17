@@ -1,0 +1,42 @@
+<script src='scripts/jquery.js'></script>
+<script src='scripts/bc-background.js'></script>
+<script>
+	chrome.extension.onMessage.addListener(
+		function(request, sender, sendResponse) {
+			switch(request.method) {
+				case "getnews" : {
+					var rss = getNews();
+					sendResponse({feed: rss});
+				} break;
+				default:{
+				}break;
+			}
+			
+		}
+	);
+	
+	function getNews() {
+		var news;
+		$.ajax({
+			url:"http://www.bungie.net/News/NewsRss.ashx",
+			method:"GET",
+			async:false,
+			dataType:"text",
+			success:function(data) {
+				news = data;
+			}
+		});
+		
+		$.ajax({
+			url:"http://api.twitter.com/1/statuses/user_timeline.rss?user_id=26280712&count=20",
+			method:"GET",
+			async:false,
+			dataType:"text",
+			success:function(data) {
+				news += data;
+			}
+		});
+		
+		return news;
+	}
+</script>
