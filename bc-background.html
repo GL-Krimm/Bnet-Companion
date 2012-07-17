@@ -16,27 +16,59 @@
 	);
 	
 	function getNews() {
-		var news;
+		var news = new Array();
 		$.ajax({
 			url:"http://www.bungie.net/News/NewsRss.ashx",
 			method:"GET",
 			async:false,
-			dataType:"text",
+			dataType:"XML",
 			success:function(data) {
-				news = data;
+					
+				$($(data).find('item')).each(function() {
+				
+					var item = {};
+					item.title = $(this).find('title').text();
+					item.link = $(this).find('link').text();
+					item.pubDate = $(this).find('pubDate').text();
+					news.push(item);
+					
+				});
 			}
 		});
-		
 		$.ajax({
 			url:"http://api.twitter.com/1/statuses/user_timeline.rss?user_id=26280712&count=20",
 			method:"GET",
 			async:false,
-			dataType:"text",
+			dataType:"XML",
 			success:function(data) {
-				news += data;
+				
+				$($(data).find('item')).each(function() {
+				
+					var item = {};
+					item.title = $(this).find('title').text();
+					item.link = $(this).find('link').text();
+					item.pubDate = $(this).find('pubDate').text();
+					news.push(item);
+				});
 			}
 		});
 		
-		return news;
+		
+		news.sort(function(a, b) {
+		
+			var lhsDate = new Date(a.pubDate.replace("+0000", "GMT"));
+			var rhsDate = new Date(b.pubDate.replace("+0000", "GMT"));
+			
+			if ( lhsDate > rhsDate ) {
+				return -1;
+			}	
+			if ( rhsDate > lhsDate ) {
+				return 1;
+			}
+			return 0;
+		});
+		
+		return JSON.stringify(news);
 	}
+	
 </script>
