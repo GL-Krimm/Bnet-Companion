@@ -29,7 +29,7 @@ bcInterface.renderNewsFeed = function(newsData) {
 			title = $.trim(title).substring(0,55).split(" ").slice(0, -1).join(" ") + "...";
 		}
 	
-		var img = (newsData[i].link.indexOf("twitter") > -1) ? "images/twitter.gif" : "images/bnet.gif";
+		var img = bcInterface.selectIcon(newsData[i].link); //(newsData[i].link.indexOf("twitter") > -1) ? "images/twitter.gif" : "images/bnet.gif";
 		var htmlString = "<li class='bc-news-item' exRef='" + newsData[i].link + "'><img src='" + img + "' /><ul class='bc-news-details' ><li><span>"+ title + "</span></li>" +
 						 "<li class='bc-news-pub-date'><span>" + newsData[i].pubDate + "</span</li></ul></li>";
 		
@@ -39,6 +39,17 @@ bcInterface.renderNewsFeed = function(newsData) {
 	$('.bc-news-item ').click(function() {
 		window.open($(this).attr('exref'));
 	});
+}
+
+bcInterface.selectIcon = function(link) {
+	var img = "images/bnet.gif";
+	
+	if ( link.indexOf("twitter") > -1 ) {
+		img = "images/twitter.gif";
+	} else if ( link.indexOf("youtube") > -1 ) {
+		img = "images/youtube.png";
+	}
+	return img;
 }
 
 $(document).ready(function() {

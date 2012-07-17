@@ -122,7 +122,7 @@ li.bc-news-item {
 	background-color: #585860;
 	opacity:0.75;
 	*/
-	background: url("images/transparent.png") transparent 0 0;
+	background-color: rgba(58,58,58,0.8);
 	min-height:60px;
 	margin:5px;
 	border:1px groove;
@@ -131,8 +131,7 @@ li.bc-news-item {
 }
 
 li.bc-news-item:hover {
-	color:#69cabd;
-	border-color:#69cabd;
+	background-color:#707070;
 }
 
 li.bc-news-item span {
@@ -142,6 +141,8 @@ li.bc-news-item span {
 
 li.bc-news-item img {
 	margin-left:3px;
+	height:30px;
+	width:30px;
 	opacity:1.0;
 	vertical-align:middle;
 	margin-top:20px;
