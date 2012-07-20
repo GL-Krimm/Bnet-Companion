@@ -1,16 +1,16 @@
 <script src='scripts/jquery.js'></script>
 <script src='scripts/bc-background.js'></script>
 <script>
-	chrome.extension.onMessage.addListener(
-		function(request, sender, sendResponse) {
+	chrome.extension.onRequest.addListener(
+		function(request, sender, callback) {
 			switch(request.method) {
 				case "getnews" : {
 					var rss = getNews();
-					sendResponse({feed: rss});
+					callback({feed: rss});
 				} break;
 				case "getprofile" : {
 					var prof = getProfile();
-					sendResponse({profile:prof});
+					callback({profile:prof});
 				} break;
 				default:{
 				}break;

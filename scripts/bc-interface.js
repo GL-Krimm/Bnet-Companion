@@ -1,6 +1,6 @@
 window.bcInterface = {};
 
-bcInterface.debug = true;
+bcInterface.debug = false;
 
 bcInterface.mockNews = new Array();
 bcInterface.mockNews.push({title:"Bungie - Your mome loves my air guitar move. IN SPACE!", pubDate:"July 19 2012", link:"http://www.bungie.net/blog.aspx?id=se7en"});
@@ -143,7 +143,7 @@ $(document).ready(function() {
 	if ( bcInterface.debug ) {
 		bcInterface.renderNewsFeed( bcInterface.mockNews );
 	} else {
-		chrome.extension.sendMessage({method:"getnews"}, function(response) {
+		chrome.extension.sendRequest({method:"getnews"}, function(response) {
 			bcInterface.renderNewsFeed( response.feed );
 		});
 	}
