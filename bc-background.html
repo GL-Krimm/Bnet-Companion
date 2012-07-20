@@ -8,6 +8,10 @@
 					var rss = getNews();
 					sendResponse({feed: rss});
 				} break;
+				case "getprofile" : {
+					var prof = getProfile();
+					sendResponse({profile:prof});
+				} break;
 				default:{
 				}break;
 			}
@@ -98,6 +102,30 @@
 		});
 		
 		return JSON.stringify(news);
+	}
+	
+	function getProfile() {
+		var profUrl = "http://www.bungie.net/Account/profile.aspx?uid=9626450";
+		
+		var profData = {};
+		
+		$.ajax({
+			url:profUrl,
+			method:"GET",
+			dataType:"html",
+			async:false,
+			success:function(response) {
+				//profData.name
+				//rank
+				//since
+				
+				//recent messages > 
+				//friends online ( xbl )
+				//sign out
+			}
+		});
+		
+		return JSON.stringify(profData);		
 	}
 	
 </script>
