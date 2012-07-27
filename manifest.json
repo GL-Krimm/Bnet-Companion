@@ -1,18 +1,13 @@
 {
+	"manifest_version" : 2,
 	"name":"BNet Companion",
 	"description":"Chrome port of the Bungie Mobile app.",
-	"version":"0.0.1",
-	"background_page":"bc-background.html",
-	"content_scripts":[
-		{					
-			"js":[ "scripts/jquery.js"],
-			"matches":["http://www.bungie.net/*"],
-			"run_at" : "document_end"
-		}
-
-	],
+	"version":"0.0.2",
+	"background": { 
+		"scripts":[ "scripts/bc-background.js", "scripts/jquery.js" ]
+	},
 	"browser_action" :{
-		"popup":"bc-interface.html",
+		"default_popup":"bc-interface.html",
 		"default_icon":"bc-logo.png"
 	},
 	"permissions":["tabs", "http://*/*", "https://*/*"]
