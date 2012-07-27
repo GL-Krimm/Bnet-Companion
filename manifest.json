@@ -4,7 +4,7 @@
 	"description":"Chrome port of the Bungie Mobile app.",
 	"version":"0.0.2",
 	"background": { 
-		"scripts":[ "scripts/bc-background.js", "scripts/jquery.js" ]
+		"scripts":[ "scripts/jquery.js", "scripts/bc-background.js" ]
 	},
 	"browser_action" :{
 		"default_popup":"bc-interface.html",

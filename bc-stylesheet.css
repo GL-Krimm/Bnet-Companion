@@ -162,6 +162,9 @@ li.bc-news-item img {
 }
 
 p.bc-news-details {
+	overflow:hidden;
+	height:32px;
+	width:200px;
 	color:#ffffff;
 	margin-left:40px;
 	margin-top:3px;

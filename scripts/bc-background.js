@@ -1,14 +1,13 @@
-var newsFeed = localStorage["newsFeed"];
-var fetchFreq = 30000; //30 seconds per poll
+getNews();
+var t = setInterval(updateNews, 30000);
+
 
 function getNewsFeed() {
-	if ( null == newsFeed ) {
-		newsFeed = getNews();
-	}
-	return newsFeed;
+	return localStorage["newsFeed"];
 }
 	
-function getNews() {console.log("getting feed");
+function getNews() {
+	console.log('getting news');
 	var news = new Array();
 	
 	news = getFeedXml("http://www.bungie.net/News/NewsRss.ashx");
@@ -27,6 +26,18 @@ function getNews() {console.log("getting feed");
 }
 
 function updateNews() {
+	console.log('updating news');
+	var news = getNews();
+	
+	var latestPubDate = new Date(news[0].pubDate);
+	var lastPubDate = new Date(localStorage["lastPubDate"]);
+	
+	if ( latestPubDate > lastPubDate ) {
+		localStorage["lastPubDate"] = news[0].pubDate;
+		chrome.browserAction.setBadgeBackgroundColor({color:[255, 0, 0, 255]});
+		var token = "New";
+		chrome.browserAction.setBadgeText({text:token});
+	}
 	
 }
 
@@ -45,7 +56,7 @@ function getFeedXml(feedUrl, sort) {
 				var item = {};
 				item.title = $(this).find('title').text();
 				item.link = $(this).find('link').text();
-				item.pubDate = $(this).find('pubDate').text();
+				item.pubDate = $(this).find('pubDate').text().replace("+0000", "GMT");
 				feedData.push(item);
 			});
 		}
@@ -89,8 +100,8 @@ function getYoutubeFeed(sort) {
 function sortFeed(feed) {
 	feed.sort(function(a, b) {
 	
-		var lhsDate = new Date(a.pubDate.replace("+0000", "GMT"));
-		var rhsDate = new Date(b.pubDate.replace("+0000", "GMT"));
+		var lhsDate = new Date(a.pubDate);
+		var rhsDate = new Date(b.pubDate);
 		
 		if ( lhsDate > rhsDate ) {
 			return -1;

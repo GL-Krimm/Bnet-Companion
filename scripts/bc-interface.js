@@ -2,7 +2,7 @@ var bg = chrome.extension.getBackgroundPage();
 
 window.bcInterface = {};
 
-bcInterface.debug = true;
+bcInterface.debug = false;
 
 bcInterface.mockNews = new Array();
 bcInterface.mockNews.push({title:"Bungie - Your mome loves my air guitar move. IN SPACE!", pubDate:"July 19 2012", link:"http://www.bungie.net/blog.aspx?id=se7en"});
@@ -16,13 +16,10 @@ bcInterface.twitterFeedUrl = "http://api.twitter.com/1/statuses/user_timeline.rs
 bcInterface.renderSelectedView = function(pageId) {
 	switch (pageId) {
 		case "news": {
-			bcInterface.renderNewsFeed( bcInterface.debug ? bcInterface.mockNews : null );
+			bcInterface.renderNewsFeed( bg.getNewsFeed() );
 		} break;
 		case "profile": {
-			//chrome.extension.sendMessage({method:"getprofile"}, function(response) {
-			//	var profile = JSON.parse(response.profile);
-				//$("#bc-content").append(img(null, profile.profileBanner));
-			//});
+			
 		} break;
 		default:{
 		} break;
@@ -142,15 +139,8 @@ $(document).ready(function() {
 		bcInterface.renderSelectedView($(this).attr('intRef'));
 	});
 	
-	if ( bcInterface.debug ) {
-		bcInterface.renderNewsFeed( bg.getNewsFeed() );
-	} 
-	//else {
-		//chrome.extension.sendRequest({method:"getnews"}, function(response) {
-			//bcInterface.renderNewsFeed( response.feed );
-		//});
-	//}
+	bcInterface.renderNewsFeed( bg.getNewsFeed() );
 	
-	
+	chrome.browserAction.setBadgeText({text: ''});
 
 });
