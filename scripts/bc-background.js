@@ -18,15 +18,14 @@ function getNews() {
 	
 	news = sortFeed(news);
 	
-	news = JSON.stringify(news);
-	
-	localStorage["newsFeed"] = news;
+	localStorage["lastPubDate"] = news[0].pubDate;
+	localStorage["newsFeed"] = JSON.stringify(news);
 	
 	return news;
 }
 
 function updateNews() {
-	console.log('updating news');
+	
 	var news = getNews();
 	
 	var latestPubDate = new Date(news[0].pubDate);
@@ -38,7 +37,7 @@ function updateNews() {
 		var token = "New";
 		chrome.browserAction.setBadgeText({text:token});
 	}
-	
+	console.log('updated news');
 }
 
 function getFeedXml(feedUrl, sort) {
