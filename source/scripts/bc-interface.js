@@ -1,4 +1,4 @@
-var bg = chrome.extension.getBackgroundPage();
+var bnetClient = chrome.extension.getBackgroundPage().bnetClient;
 
 window.bcInterface = {};
 
@@ -16,7 +16,7 @@ bcInterface.twitterFeedUrl = "http://api.twitter.com/1/statuses/user_timeline.rs
 bcInterface.renderSelectedView = function(pageId) {
 	switch (pageId) {
 		case "news": {
-			bcInterface.renderNewsFeed( bg.getNewsFeed() );
+			bcInterface.renderNewsFeed( bnetClient.getNewsFeed() );
 		} break;
 		case "profile": {
 			
@@ -139,7 +139,7 @@ $(document).ready(function() {
 		bcInterface.renderSelectedView($(this).attr('intRef'));
 	});
 	
-	bcInterface.renderNewsFeed( bg.getNewsFeed() );
+	bcInterface.renderNewsFeed( bnetClient.getNewsFeed() );
 	
 	chrome.browserAction.setBadgeText({text: ''});
 
