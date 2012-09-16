@@ -1,9 +1,5 @@
 var bnetClient = new BnetCompanion();
 
-function responseProcessor(f) {
-	console.log("uh...running?");
-}
-
 bnetClient.updateNews();
 var t = setInterval(bnetClient.updateNews, 30000);
 
@@ -40,7 +36,7 @@ function BnetCompanion() {
 	};
 	
 	this.setAccessToken = function(token) {
-		twitter.accessToken = token;
+		localStorage['access_token'] = token;
 	}
 	
 	/* ============ "private" methods ================= */
@@ -52,7 +48,7 @@ function BnetCompanion() {
 		
 		var bungieUrl = "http";
 		
-		if ( twitter.accessToken ) {
+		if ( localStorage['access_token'] ) {
 			news = news.concat(getTwitterFeed());
 		} else {
 			news = news.concat(getFeedXml("http://api.twitter.com/1/statuses/user_timeline.rss?user_id=26280712&count=40"));
@@ -87,21 +83,14 @@ function BnetCompanion() {
 			signatures:{
 				consumer_key:twitter.consumerKey,
 				shared_secret:twitter.consumerSecret,
-				auth_token:twitter.accessToken
+				auth_token:localStorage['access_token']
 			}
 		});
 		
 		$.ajax({
 			url:result.signed_url,
 			success:function(data) {
-				$($(data).find('item')).each(function() {
-				
-					var item = {};
-					item.title = $(this).find('title').text().replace("bungie: ", "");
-					item.link = $(this).find('link').text();
-					item.pubDate = $(this).find('pubDate').text().replace("+0000", "GMT");
-					feedData.push(item);
-				});			
+				feedData = processXmlData(data);		
 			}
 		});
 		
@@ -117,15 +106,7 @@ function BnetCompanion() {
 			async:false,
 			dataType:"XML",
 			success:function(data) {
-				
-				$($(data).find('item')).each(function() {
-				
-					var item = {};
-					item.title = $(this).find('title').text().replace("bungie: ", "");
-					item.link = $(this).find('link').text();
-					item.pubDate = $(this).find('pubDate').text().replace("+0000", "GMT");
-					feedData.push(item);
-				});
+				feedData = processXmlData(data);
 			}
 		});
 		return feedData;
@@ -210,10 +191,10 @@ function BnetCompanion() {
 					
 					switch (node[0]) {
 						case "oauth_token" : {
-							twitter.requestToken = node[1];
+							localStorage['request_token'] = node[1];
 						} break;
 						case "oauth_token_secret" : {
-							twitter.requestTokenSecret = node[1];
+							localStorage['request_token_secret'] = node[1];
 						} break;
 						default : {
 							console.log("some other data");
@@ -223,7 +204,7 @@ function BnetCompanion() {
 				}
 				if ( twitter.requestToken ) {
 					chrome.tabs.create({
-						url:"https://api.twitter.com/oauth/authorize?oauth_token=" + twitter.requestToken
+						url:"https://api.twitter.com/oauth/authorize?oauth_token=" + localStorage['request_token']
 					});
 				}
 				
@@ -232,11 +213,19 @@ function BnetCompanion() {
 		
 	};
 	
-	function twitterAuth() {
-		var oauth = OAuthSimple(twitter.consumerKey,twitter.consumerSecret);
+	function processXmlData(data) {
+		var feedData = new Array();
+		$($(data).find('item')).each(function() {
+						
+			var item = {};
+			item.title = $(this).find('title').text().replace("bungie: ", "");
+			item.link = $(this).find('link').text();
+			item.pubDate = $(this).find('pubDate').text().replace("+0000", "GMT");
+			feedData.push(item);
+		});
+		return feedData;
 	}
 	
-	var settings = {};
 	var twitter = {};
 	twitter.consumerKey = "lwCCH94saDQSOqEcuGD7w";
 	twitter.consumerSecret = "Au2wXTBYyEyaDW2lv1jMDAtFj6aUhyRBxYf9h9YfA";	
@@ -247,7 +236,6 @@ $(document).ready(function() {
 	console.log(window.location.href);
 	var d = window.location.href.split("?");
 	if (d[1]) {
-		console.log("i got one!");
 		d = d[1].split("&");
 		for ( var i in d ) {
 			var c = d[i].split("=");
@@ -256,6 +244,7 @@ $(document).ready(function() {
 				bnetClient.setAccessToken(c[1]);
 			}
 		}
+		window.close();
 	}
 });
 
