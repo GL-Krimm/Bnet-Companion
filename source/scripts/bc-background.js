@@ -1,5 +1,9 @@
 var bnetClient = new BnetCompanion();
 
+function responseProcessor(f) {
+	console.log("uh...running?");
+}
+
 bnetClient.updateNews();
 var t = setInterval(bnetClient.updateNews, 30000);
 
@@ -35,6 +39,10 @@ function BnetCompanion() {
 		console.log('updated news');	
 	};
 	
+	this.setAccessToken = function(token) {
+		twitter.accessToken = token;
+	}
+	
 	/* ============ "private" methods ================= */
 	function getNews() {
 		console.log('getting news');
@@ -42,8 +50,14 @@ function BnetCompanion() {
 		
 		news = getFeedXml("http://www.bungie.net/News/NewsRss.ashx");
 		
-		news = news.concat(getFeedXml("http://api.twitter.com/1/statuses/user_timeline.rss?user_id=26280712&count=40&oauth_token=" + twitter.bKey));
+		var bungieUrl = "http";
 		
+		if ( twitter.accessToken ) {
+			news = news.concat(getTwitterFeed());
+		} else {
+			news = news.concat(getFeedXml("http://api.twitter.com/1/statuses/user_timeline.rss?user_id=26280712&count=40"));
+		}
+				
 		news = news.concat(getYoutubeFeed());	
 		
 		news = sortFeed(news);
@@ -55,6 +69,43 @@ function BnetCompanion() {
 		}
 				
 		return news;	
+	}
+	
+	function getTwitterFeed() {
+		var feedData = new Array();
+	
+		var result = OAuthSimple().sign({
+			action:"GET",
+			method:"HMAC-SHA1",
+			type:"XML",
+			path:"https://api.twitter.com/1/statuses/user_timeline.rss?user_id=26280712&count=40",
+			parameters:{
+				oauth_version:"1.0",
+				oauth_signature_method:"HMAC-SHA1",
+				oauth_callback:window.top.location
+			},
+			signatures:{
+				consumer_key:twitter.consumerKey,
+				shared_secret:twitter.consumerSecret,
+				auth_token:twitter.accessToken
+			}
+		});
+		
+		$.ajax({
+			url:result.signed_url,
+			success:function(data) {
+				$($(data).find('item')).each(function() {
+				
+					var item = {};
+					item.title = $(this).find('title').text().replace("bungie: ", "");
+					item.link = $(this).find('link').text();
+					item.pubDate = $(this).find('pubDate').text().replace("+0000", "GMT");
+					feedData.push(item);
+				});			
+			}
+		});
+		
+		return feedData;
 	}
 
 	function getFeedXml(feedUrl, sort) {
@@ -131,36 +182,54 @@ function BnetCompanion() {
 	}	
 	
 	this.requestToken = function() {
-		var currentDate = Date.now();
-		accessor = {
-			consumerSecret:twitter.consumerSecret
-		};
-		message = {
-			action:"https://api.twitter.com/oauth/request_token",
-			method:"GET",
-			parameters:[
-				["oauth_consumer_key",twitter.consumerKey],
-				["oauth_signature_method","HMAC-SHA1"],
-				["oauth_version","1.0"],
-				["oauth_callback",window.top.location+"?t=" + currentDate]
-			],
-			success:function(response) {
-				alert(response);
-			}
-		};
-		OAuth.setTimestampAndNonce(message);
-		OAuth.SignatureMethod.sign(message,accessor);
-		
-		$.ajax({
-			url:message.url,
-			type:message.method,
-			data:OAuth.getParameterMap(message.parameters),
-			success:function(g,f,h) {
-				console.log(g);
-				console.log(f);
-				console.log(JSON.stringify(h));
+		var callbackString = window.top.location + "?t=" + Date.now();
+		var result = OAuthSimple().sign({
+			action:"GET",
+			method:"HMAC-SHA1",
+			type:"text",
+			path:"https://api.twitter.com/oauth/request_token",
+			parameters:{
+				oauth_version:"1.0",
+				oauth_signature_method:"HMAC-SHA1",
+				oauth_callback:window.top.location
+			},
+			signatures:{
+				consumer_key:twitter.consumerKey,
+				shared_secret:twitter.consumerSecret
 			}
 		});
+		
+		console.log(result.signed_url);
+		
+		$.ajax({
+			url:result.signed_url,
+			success:function(data) {
+				data=data.split("&");
+				for (var i in data) {
+					var node = data[i].split("=");
+					
+					switch (node[0]) {
+						case "oauth_token" : {
+							twitter.requestToken = node[1];
+						} break;
+						case "oauth_token_secret" : {
+							twitter.requestTokenSecret = node[1];
+						} break;
+						default : {
+							console.log("some other data");
+						} break;
+ 					}
+					
+				}
+				if ( twitter.requestToken ) {
+					chrome.tabs.create({
+						url:"https://api.twitter.com/oauth/authorize?oauth_token=" + twitter.requestToken
+					});
+				}
+				
+			}
+		});
+		
 	};
 	
 	function twitterAuth() {
@@ -170,10 +239,23 @@ function BnetCompanion() {
 	var settings = {};
 	var twitter = {};
 	twitter.consumerKey = "lwCCH94saDQSOqEcuGD7w";
-	twitter.consumerSecret = "Au2wXTBYyEyaDW2lv1jMDAtFj6aUhyRBxYf9h9YfA";
-	
-	twitter.bKey = "180827393-dBfBsjBADfgU1nuJndS4UZBOAVsETodz3UuUc9lm";
-	twitter.bSecret = "Y8Qb2wb65vmmeXr53G3r90O1UvAgXTyWvG9pzsBqPI";
-	
+	twitter.consumerSecret = "Au2wXTBYyEyaDW2lv1jMDAtFj6aUhyRBxYf9h9YfA";	
 }
+
+$(document).ready(function() {
+	console.log("running...");
+	console.log(window.location.href);
+	var d = window.location.href.split("?");
+	if (d[1]) {
+		console.log("i got one!");
+		d = d[1].split("&");
+		for ( var i in d ) {
+			var c = d[i].split("=");
+			if ( c[0] == "oauth_token" ) {
+				console.log(c[1]);
+				bnetClient.setAccessToken(c[1]);
+			}
+		}
+	}
+});
 
