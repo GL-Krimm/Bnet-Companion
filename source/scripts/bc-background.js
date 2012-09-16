@@ -18,13 +18,13 @@ function BnetCompanion() {
 	this.updateNews = function() {
 		var news = getNews();
 		
-		if ( localStorage["lastPubDate"].length > 0 ) {
+		if ( localStorage["lastPubDate"] ) {
 			var latestPubDate = new Date(news[0].pubDate);
 			var lastPubDate = new Date(localStorage["lastPubDate"]);
 					
 			if ( latestPubDate > lastPubDate ) {
 				localStorage["lastPubDate"] = news[0].pubDate;
-				chrome.browserAction.setBadgeBackgroundColor({color:[255, 0, 0, 255]});
+				chrome.browserAction.setBadgeBackgroundColor({color:[0, 150, 219, 255]});
 				var token = "New";
 				chrome.browserAction.setBadgeText({text:token});
 			}		
@@ -48,8 +48,12 @@ function BnetCompanion() {
 		
 		news = sortFeed(news);
 		
-		localStorage["newsFeed"] = JSON.stringify(news);
-		
+		// only update the stored data if data is returned, so the user
+		// can view the last fetched news while offline
+		if ( news && news.length > 0 ) {
+			localStorage["newsFeed"] = JSON.stringify(news);
+		}
+				
 		return news;	
 	}
 
@@ -66,7 +70,7 @@ function BnetCompanion() {
 				$($(data).find('item')).each(function() {
 				
 					var item = {};
-					item.title = $(this).find('title').text();
+					item.title = $(this).find('title').text().replace("bungie: ", "");
 					item.link = $(this).find('link').text();
 					item.pubDate = $(this).find('pubDate').text().replace("+0000", "GMT");
 					feedData.push(item);
@@ -125,6 +129,43 @@ function BnetCompanion() {
 		});
 		return feed;
 	}	
+	
+	this.requestToken = function() {
+		var currentDate = Date.now();
+		accessor = {
+			consumerSecret:twitter.consumerSecret
+		};
+		message = {
+			action:"https://api.twitter.com/oauth/request_token",
+			method:"GET",
+			parameters:[
+				["oauth_consumer_key",twitter.consumerKey],
+				["oauth_signature_method","HMAC-SHA1"],
+				["oauth_version","1.0"],
+				["oauth_callback",window.top.location+"?t=" + currentDate]
+			],
+			success:function(response) {
+				alert(response);
+			}
+		};
+		OAuth.setTimestampAndNonce(message);
+		OAuth.SignatureMethod.sign(message,accessor);
+		
+		$.ajax({
+			url:message.url,
+			type:message.method,
+			data:OAuth.getParameterMap(message.parameters),
+			success:function(g,f,h) {
+				console.log(g);
+				console.log(f);
+				console.log(JSON.stringify(h));
+			}
+		});
+	};
+	
+	function twitterAuth() {
+		var oauth = OAuthSimple(twitter.consumerKey,twitter.consumerSecret);
+	}
 	
 	var settings = {};
 	var twitter = {};

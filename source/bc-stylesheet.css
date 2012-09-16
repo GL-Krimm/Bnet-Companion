@@ -6,7 +6,7 @@
 
 .bc-body {
 	background-color:#000000;
-	font-family:arial;
+	font-family: "HelveticaNeue-Light", "Helvetica Neue Light", "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif; 
 	width:280px;
 	color:#ffffff;
 }
