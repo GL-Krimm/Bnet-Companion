@@ -39,6 +39,25 @@
 
 }
 
+div#bc-settings {
+	display:none;
+	position:relative;
+	text-align:left;
+	top:5px;
+	left:5px;
+	
+}
+
+span.span-button {
+	display:inline-block;
+	cursor:pointer;
+	padding:3px;
+	border: 1px groove;
+	border-radius: 3px;
+	color:white;
+	
+}
+
 /* scrollbars */
 ::-webkit-scrollbar {
     width: 10px;
@@ -78,6 +97,7 @@ h1 {
 }
 
 .bc-bottom-nav li {
+	cursor:pointer;
 	display:inline-block;
 	padding-left:10px;
 	padding-right:10px;

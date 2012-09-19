@@ -16,10 +16,13 @@ bcInterface.twitterFeedUrl = "http://api.twitter.com/1/statuses/user_timeline.rs
 bcInterface.renderSelectedView = function(pageId) {
 	switch (pageId) {
 		case "news": {
-			bcInterface.renderNewsFeed( bnetClient.getNewsFeed() );
+			bcInterface.renderNewsFeed( bcInterface.debug ? bcInterface.mockNews : bnetClient.getNewsFeed() );
 		} break;
 		case "profile": {
 			
+		} break;
+		case "settings" : {
+			$("#bc-settings").show();
 		} break;
 		default:{
 		} break;
@@ -28,7 +31,7 @@ bcInterface.renderSelectedView = function(pageId) {
 };
 
 bcInterface.renderNewsFeed = function(newsData) {
-	$('#bc-content').append(ul({id:'bc-news', cssClass:'bc-news-list'}));
+	$('#bc-news').children().remove(); //append(ul({id:'bc-news', cssClass:'bc-news-list'}));
 	
 	newsData = JSON.parse(newsData);
 	for ( var i = 0; i < newsData.length; i++ )
@@ -48,7 +51,7 @@ bcInterface.renderNewsFeed = function(newsData) {
 								span({cssClass:'bc-news-pub-date'}, newsData[i].pubDate)
 							);
 				
-		$('#bc-news').append(htmlString);	
+		$('#bc-news').append(htmlString).show();
 	}
 	
 	$('.bc-news-item ').click(function() {
@@ -135,11 +138,19 @@ $(document).ready(function() {
 	$('.bc-nav-item').click(function() {
 		$('.bc-nav-item').removeClass('bc-nav-active');
 		$(this).addClass('bc-nav-active');
-		$('#bc-content').children().remove();
+		$('#bc-content').children().hide();
 		bcInterface.renderSelectedView($(this).attr('intRef'));
 	});
 	
-	bcInterface.renderNewsFeed( bnetClient.getNewsFeed() );
+	bcInterface.renderNewsFeed( bcInterface.debug ? bcInterface.mockNews : bnetClient.getNewsFeed() );
+	
+	if ( bnetClient.signedIntoTwitter ) {
+		
+	}
+	
+	$("#bc-twitter-connect").click(function() {
+		bnetClient.requestToken();
+	});
 	
 	chrome.browserAction.setBadgeText({text: ''});
 

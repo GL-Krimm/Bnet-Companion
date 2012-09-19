@@ -162,6 +162,16 @@ function BnetCompanion() {
 		return feed;
 	}	
 	
+	this.signedIntoTwitter = function() {
+		var signedIn = false;
+		
+		if ( null != localStorage['access_token'] && localStorage['access_token'].length > 0 ) {
+			signedIn = true;
+		}
+		
+		return signedIn;
+	};
+	
 	this.requestToken = function() {
 		var callbackString = window.top.location + "?t=" + Date.now();
 		var result = OAuthSimple().sign({
