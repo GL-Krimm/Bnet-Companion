@@ -22,12 +22,34 @@ bcInterface.renderSelectedView = function(pageId) {
 			
 		} break;
 		case "settings" : {
-			$("#bc-settings").show();
+			bcInterface.renderSettings();
 		} break;
 		default:{
 		} break;
 	}
 	return false;
+};
+
+bcInterface.renderSettings = function() {
+/*
+	<span id='bc-twitter-connect' class='span-button'>
+		Connect to Twitter
+	</span>
+*/
+	var signedIn = bnetClient.signedIntoTwitter() 
+	var elemId = signedIn ? 'bc-twitter-disconnect' : 'bc-twitter-connect';
+	var htmlStr = span({id:elemId, cssClass:'span-button'},
+		signedIn ? "Disconnect from Twitter" : "Connect to Twitter"
+	);
+	
+	$("#bc-settings").append(htmlStr);
+	
+	$("#bc-twitter-connect").click(function() {
+		bnetClient.requestToken();
+	});
+	
+	$("#bc-settings").show();
+
 };
 
 bcInterface.renderNewsFeed = function(newsData) {
@@ -148,9 +170,7 @@ $(document).ready(function() {
 		
 	}
 	
-	$("#bc-twitter-connect").click(function() {
-		bnetClient.requestToken();
-	});
+
 	
 	chrome.browserAction.setBadgeText({text: ''});
 

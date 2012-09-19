@@ -12,31 +12,31 @@ function BnetCompanion() {
 	
 	/* ============ "public" methods ================= */
 	this.getNewsFeed = function() {
-		return localStorage["newsFeed"];
+		return localStorage.newsFeed;
 	};
 	
 	this.updateNews = function() {
 		var news = getNews();
 		
-		if ( localStorage["lastPubDate"] ) {
+		if ( localStorage.lastPubDate ) {
 			var latestPubDate = new Date(news[0].pubDate);
-			var lastPubDate = new Date(localStorage["lastPubDate"]);
+			var lastPubDate = new Date(localStorage.lastPubDate);
 					
 			if ( latestPubDate > lastPubDate ) {
-				localStorage["lastPubDate"] = news[0].pubDate;
+				localStorage.lastPubDate = news[0].pubDate;
 				chrome.browserAction.setBadgeBackgroundColor({color:[0, 150, 219, 255]});
 				var token = "New";
 				chrome.browserAction.setBadgeText({text:token});
 			}		
 		} else {
-			localStorage["lastPubDate"] = news[0].pubDate;
+			localStorage.lastPubDate = news[0].pubDate;
 		}
 		
 		console.log('updated news');	
 	};
 	
 	this.setAccessToken = function(token) {
-		localStorage['access_token'] = token;
+		localStorage.accessToken = token;
 	}
 	
 	/* ============ "private" methods ================= */
@@ -48,9 +48,11 @@ function BnetCompanion() {
 		
 		var bungieUrl = "http";
 		
-		if ( localStorage['access_token'] ) {
+		if ( localStorage.accessToken ) {
+			console.log("Getting authed bungie feed");
 			news = news.concat(getTwitterFeed());
 		} else {
+			console.log("Getting unauthed bungie feed");
 			news = news.concat(getFeedXml("http://api.twitter.com/1/statuses/user_timeline.rss?user_id=26280712&count=40"));
 		}
 				
@@ -61,7 +63,7 @@ function BnetCompanion() {
 		// only update the stored data if data is returned, so the user
 		// can view the last fetched news while offline
 		if ( news && news.length > 0 ) {
-			localStorage["newsFeed"] = JSON.stringify(news);
+			localStorage.newsFeed = JSON.stringify(news);
 		}
 				
 		return news;	
@@ -73,7 +75,7 @@ function BnetCompanion() {
 		var result = OAuthSimple().sign({
 			action:"GET",
 			method:"HMAC-SHA1",
-			type:"XML",
+			dataType:"XML",
 			path:"https://api.twitter.com/1/statuses/user_timeline.rss?user_id=26280712&count=40",
 			parameters:{
 				oauth_version:"1.0",
@@ -83,17 +85,21 @@ function BnetCompanion() {
 			signatures:{
 				consumer_key:twitter.consumerKey,
 				shared_secret:twitter.consumerSecret,
-				auth_token:localStorage['access_token']
+				auth_token:localStorage.accessToken
 			}
 		});
 		
 		$.ajax({
 			url:result.signed_url,
+			dataType:"XML",
+			method:"GET",
+			async:false,
 			success:function(data) {
+				console.log("got something...");
+				console.log(data);
 				feedData = processXmlData(data);		
 			}
 		});
-		
 		return feedData;
 	}
 
@@ -106,6 +112,8 @@ function BnetCompanion() {
 			async:false,
 			dataType:"XML",
 			success:function(data) {
+				console.log("got something...");
+				console.log(data);
 				feedData = processXmlData(data);
 			}
 		});
@@ -163,13 +171,18 @@ function BnetCompanion() {
 	}	
 	
 	this.signedIntoTwitter = function() {
+		console.log("checking if signed in: " + localStorage.accessToken);
 		var signedIn = false;
 		
-		if ( null != localStorage['access_token'] && localStorage['access_token'].length > 0 ) {
+		if ( null != localStorage.accessToken && localStorage.accessToken.length > 0 ) {
 			signedIn = true;
 		}
 		
 		return signedIn;
+	};
+	
+	this.log = function(msg) {
+		console.log(msg);
 	};
 	
 	this.requestToken = function() {
@@ -201,20 +214,20 @@ function BnetCompanion() {
 					
 					switch (node[0]) {
 						case "oauth_token" : {
-							localStorage['request_token'] = node[1];
+							localStorage.requestToken = node[1];
 						} break;
 						case "oauth_token_secret" : {
-							localStorage['request_token_secret'] = node[1];
+							localStorage.requestTokenSecret = node[1];
 						} break;
 						default : {
-							console.log("some other data");
+							console.log("some other data: " + node[0]);
 						} break;
  					}
 					
 				}
-				if ( twitter.requestToken ) {
+				if ( localStorage.requestToken ) {
 					chrome.tabs.create({
-						url:"https://api.twitter.com/oauth/authorize?oauth_token=" + localStorage['request_token']
+						url:"https://api.twitter.com/oauth/authorize?oauth_token=" + localStorage.requestToken
 					});
 				}
 				
@@ -225,6 +238,7 @@ function BnetCompanion() {
 	
 	function processXmlData(data) {
 		var feedData = new Array();
+		console.log(data.toString());
 		$($(data).find('item')).each(function() {
 						
 			var item = {};
@@ -242,18 +256,21 @@ function BnetCompanion() {
 }
 
 $(document).ready(function() {
-	console.log("running...");
-	console.log(window.location.href);
+	bnetClient.log("init...");
+	bnetClient.log(window.location.href);
 	var d = window.location.href.split("?");
 	if (d[1]) {
 		d = d[1].split("&");
 		for ( var i in d ) {
 			var c = d[i].split("=");
 			if ( c[0] == "oauth_token" ) {
-				console.log(c[1]);
+				bnetClient.log("got auth token");
+				bnetClient.log(c[1]);
 				bnetClient.setAccessToken(c[1]);
+				bnetClient.log(localStorage.accessToken);
 			}
 		}
+		window.open('', '_self', ''); //bug fix
 		window.close();
 	}
 });

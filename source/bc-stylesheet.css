@@ -11,6 +11,10 @@
 	color:#ffffff;
 }
 
+.hidden {
+	display:none;
+}
+
 #bc-header {
 	left:0;
 	top:0;
