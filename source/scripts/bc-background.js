@@ -39,6 +39,78 @@ function BnetCompanion() {
 		localStorage.accessToken = token;
 	}
 	
+	this.signedIntoTwitter = function() {
+		console.log("checking if signed in: " + localStorage.accessToken);
+		var signedIn = false;
+		
+		if ( null != localStorage.accessToken && localStorage.accessToken.length > 0 ) {
+			signedIn = true;
+		}
+		
+		return signedIn;
+	};
+	
+	this.log = function(msg) {
+		console.log(msg);
+	};
+	
+	this.requestToken = function() {
+		var callbackString = window.top.location + "?t=" + Date.now();
+		var result = OAuthSimple().sign({
+			action:"GET",
+			method:"HMAC-SHA1",
+			type:"text",
+			path:"https://api.twitter.com/oauth/request_token",
+			parameters:{
+				oauth_version:"1.0",
+				oauth_signature_method:"HMAC-SHA1",
+				oauth_callback:window.top.location
+			},
+			signatures:{
+				consumer_key:twitter.consumerKey,
+				shared_secret:twitter.consumerSecret
+			}
+		});
+		
+		console.log(result.signed_url);
+		
+		$.ajax({
+			url:result.signed_url,
+			success:function(data) {
+				data=data.split("&");
+				for (var i in data) {
+					var node = data[i].split("=");
+					
+					switch (node[0]) {
+						case "oauth_token" : {
+							localStorage.requestToken = node[1];
+						} break;
+						case "oauth_token_secret" : {
+							localStorage.requestTokenSecret = node[1];
+						} break;
+						default : {
+							console.log("some other data: " + node[0]);
+						} break;
+ 					}
+					
+				}
+				if ( localStorage.requestToken ) {
+					chrome.tabs.create({
+						url:"https://api.twitter.com/oauth/authorize?oauth_token=" + localStorage.requestToken
+					});
+				}
+				
+			}
+		});
+		
+	};
+	
+	this.twitterSignOut = function() {
+		window.localStorage.removeItem('accessToken');
+		window.localStorage.removeItem('requestToken');
+		window.localStorage.removeItem('requestTokenSecret');
+	};
+	
 	/* ============ "private" methods ================= */
 	function getNews() {
 		console.log('getting news');
@@ -170,71 +242,7 @@ function BnetCompanion() {
 		return feed;
 	}	
 	
-	this.signedIntoTwitter = function() {
-		console.log("checking if signed in: " + localStorage.accessToken);
-		var signedIn = false;
-		
-		if ( null != localStorage.accessToken && localStorage.accessToken.length > 0 ) {
-			signedIn = true;
-		}
-		
-		return signedIn;
-	};
 	
-	this.log = function(msg) {
-		console.log(msg);
-	};
-	
-	this.requestToken = function() {
-		var callbackString = window.top.location + "?t=" + Date.now();
-		var result = OAuthSimple().sign({
-			action:"GET",
-			method:"HMAC-SHA1",
-			type:"text",
-			path:"https://api.twitter.com/oauth/request_token",
-			parameters:{
-				oauth_version:"1.0",
-				oauth_signature_method:"HMAC-SHA1",
-				oauth_callback:window.top.location
-			},
-			signatures:{
-				consumer_key:twitter.consumerKey,
-				shared_secret:twitter.consumerSecret
-			}
-		});
-		
-		console.log(result.signed_url);
-		
-		$.ajax({
-			url:result.signed_url,
-			success:function(data) {
-				data=data.split("&");
-				for (var i in data) {
-					var node = data[i].split("=");
-					
-					switch (node[0]) {
-						case "oauth_token" : {
-							localStorage.requestToken = node[1];
-						} break;
-						case "oauth_token_secret" : {
-							localStorage.requestTokenSecret = node[1];
-						} break;
-						default : {
-							console.log("some other data: " + node[0]);
-						} break;
- 					}
-					
-				}
-				if ( localStorage.requestToken ) {
-					chrome.tabs.create({
-						url:"https://api.twitter.com/oauth/authorize?oauth_token=" + localStorage.requestToken
-					});
-				}
-				
-			}
-		});
-		
-	};
 	
 	function processXmlData(data) {
 		var feedData = new Array();
