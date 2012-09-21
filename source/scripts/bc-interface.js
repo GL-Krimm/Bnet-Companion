@@ -38,7 +38,19 @@ bcInterface.renderProfile = function() {
 	console.log(bnetClient.getUserDetail("bnetBanner"));
 	$("#bc-profile-banner").css("background-image", "url(" + bnetClient.getUserDetail("bnetBanner") + ")" );
 	$("#bc-xbl-avatar").attr('src', "http://avatar.xboxlive.com/avatar/" + bnetClient.getUserDetail("gamerTag") + "/avatarpic-s.png");
+	$("#bc-gamertag").text(bnetClient.getUserDetail("gamerTag"));
 	$("#bc-member-since").text(bnetClient.getUserDetail("bnetMemberSince"));
+	
+	var msgCount = bnetClient.getUserDetail("bnetMessageCount");
+	if ( msgCount > 0 ) {
+		$("#bc-message-count").text(msgCount).append("<strong> ></strong>");
+	}
+	//xblFriendsOnline
+	var friendCount = bnetClient.getUserDetail("xblFriendsOnline");
+	if ( friendCount > 0 ) {
+		$("#bc-friend-count").text(friendCount).append("<strong> ></strong>");
+	}		
+	
 	$("#bc-profile").show();
 };
 

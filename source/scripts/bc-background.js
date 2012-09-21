@@ -140,6 +140,8 @@ function BnetCompanion() {
 					extractLastActive($(doc).find("#ctl00_mainContent_header_lblLastActive"));
 					extractMemberSince($(doc).find("#ctl00_mainContent_lblMemberSince2"));
 					extractGamerTag($(doc).find("#ctl00_mainContent_header_gtFloatLabel"));
+					extractNewMessageCount($(doc).find("#ctl00_dashboardNav_loggedInNormal"));
+					extractXblFriendsOnline($(doc).find("#ctl00_dashboardNav_loggedInNormal"));
 				} else {
 					localStorage.userName = localStorage.userName ? localStorage.userName : "Unknown"	
 					localStorage.bnetAvatar = localStorage.bnetAvatar ? localStorage.bnetAvatar : ""
@@ -341,6 +343,14 @@ function BnetCompanion() {
 	function extractGamerTag(elem) {
 		localStorage.gamerTag = elem.text().split(": ")[1];
 		console.log(localStorage.gamerTag);
+	}
+	
+	function extractXblFriendsOnline(elem) {
+		localStorage.xblFriendsOnline = parseInt($(elem).find("li.friendsOnline").find('a').text());
+	}
+	
+	function extractNewMessageCount(elem) {
+		localStorage.bnetMessageCount = parseInt($(elem).find("li.messages").find('a').text());
 	}
 	
 	var twitter = {};

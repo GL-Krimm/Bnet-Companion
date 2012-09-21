@@ -108,11 +108,15 @@ ul#bc-profile-nav li  span {
 	top: -6px;
 }
 span.right {
-	color: #585858;
+	color: #0096db;
 	float: right;
 	text-align: right;
 	margin-right: 3px;
 	margin-top: 0.8em;
+}
+
+span.right strong {
+	color: #585858;
 }
 
 .bottom-border {
