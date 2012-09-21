@@ -1,5 +1,6 @@
 var bnetClient = new BnetCompanion();
 
+bnetClient.fetchUserName();
 bnetClient.updateNews();
 var t = setInterval(bnetClient.updateNews, 30000);
 
@@ -109,6 +110,32 @@ function BnetCompanion() {
 		window.localStorage.removeItem('accessToken');
 		window.localStorage.removeItem('requestToken');
 		window.localStorage.removeItem('requestTokenSecret');
+	};
+	
+	this.getUserName = function() {
+		return localStorage.userName;
+	};
+	
+	this.fetchUserName = function() {
+		$.ajax({
+			url:"http://www.bungie.net/account/profile.aspx",
+			method:"GET",
+			dataType:"text",
+			async:false,
+			success:function(response) {
+				var doc = document.createElement('html');
+				doc.innerHTML = response;
+				
+				var elem = $(doc).find('title')[0].text;
+				if ( elem.indexOf("Profile") > 0 ) {
+					elem = elem.split(" ");
+					var name = $.trim(elem[elem.length - 1]);
+					localStorage.userName = name;
+				} else {
+					localStorage.userName = "";
+				}				
+			}
+		});
 	};
 	
 	/* ============ "private" methods ================= */

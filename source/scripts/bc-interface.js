@@ -19,7 +19,7 @@ bcInterface.renderSelectedView = function(pageId) {
 			bcInterface.renderNewsFeed( bcInterface.debug ? bcInterface.mockNews : bnetClient.getNewsFeed() );
 		} break;
 		case "profile": {
-			
+			bcInterface.renderProfile();
 		} break;
 		case "settings" : {
 			bcInterface.renderSettings();
@@ -30,7 +30,15 @@ bcInterface.renderSelectedView = function(pageId) {
 	return false;
 };
 
+bcInterface.renderProfile = function() {
+	$("#bc-page-title").text("Profile: " + bnetClient.getUserName());
+	$("#bc-profile-img").attr('src', 'http://www.bungie.net/Forums/skins/default/avatars/sep.jpg');
+	$("#bc-profile-name").text(bnetClient.getUserName());
+	$("#bc-profile").show();
+};
+
 bcInterface.renderSettings = function() {
+	$("#bc-page-title").text("Settings");
 
 	$("#bc-settings").children().remove();
 	var signedIn = bnetClient.signedIntoTwitter() 
@@ -55,6 +63,7 @@ bcInterface.renderSettings = function() {
 };
 
 bcInterface.renderNewsFeed = function(newsData) {
+	$("#bc-page-title").text("Bungie News");
 	$('#bc-news').children().remove();
 	
 	newsData = JSON.parse(newsData);
