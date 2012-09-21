@@ -139,12 +139,15 @@ function BnetCompanion() {
 					extractForumRank($(doc).find("#ctl00_mainContent_header_forumPopover"));
 					extractLastActive($(doc).find("#ctl00_mainContent_header_lblLastActive"));
 					extractMemberSince($(doc).find("#ctl00_mainContent_lblMemberSince2"));
+					extractGamerTag($(doc).find("#ctl00_mainContent_header_gtFloatLabel"));
 				} else {
 					localStorage.userName = localStorage.userName ? localStorage.userName : "Unknown"	
 					localStorage.bnetAvatar = localStorage.bnetAvatar ? localStorage.bnetAvatar : ""
 					localStorage.bnetBanner = localStorage.bnetBanner ? localStorage.bnetBanner : "http://www.bungie.net/images/Forums/UserSkins/default.jpg"
 					localStorage.bnetRank = localStorage.bnetRank ? localStorage.bnetRank : "";
 					localStorage.bnetLastActive = localStorage.bnetLastActive ? localStorage.bnetLastActive : "Unknown";
+					localStorage.bnetMemberSince = localStorage.bnetMemberSince ? localStorage.bnetMemberSince : "Unknown";
+					localStorage.gamerTag = localStorage.gamerTag ? localStorage.gamerTag : "";
 					
 				}		
 			}
@@ -333,6 +336,11 @@ function BnetCompanion() {
 	
 	function extractMemberSince(elem) {
 		localStorage.bnetMemberSince = elem.text();
+	}
+	
+	function extractGamerTag(elem) {
+		localStorage.gamerTag = elem.text().split(": ")[1];
+		console.log(localStorage.gamerTag);
 	}
 	
 	var twitter = {};

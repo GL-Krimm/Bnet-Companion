@@ -31,12 +31,13 @@ bcInterface.renderSelectedView = function(pageId) {
 };
 
 bcInterface.renderProfile = function() {
-	$("#bc-page-title").text("Profile: " + bnetClient.getUserDetail("bnetUserName"));
+	$("#bc-page-title").text("Profile");
 	$("#bc-forum-rank").text(bnetClient.getUserDetail("bnetRank"));
 	$("#bc-profile-img").attr('src', bnetClient.getUserDetail("bnetAvatar"));
 	$("#bc-profile-name").text(bnetClient.getUserDetail("bnetUserName"));
 	console.log(bnetClient.getUserDetail("bnetBanner"));
 	$("#bc-profile-banner").css("background-image", "url(" + bnetClient.getUserDetail("bnetBanner") + ")" );
+	$("#bc-xbl-avatar").attr('src', "http://avatar.xboxlive.com/avatar/" + bnetClient.getUserDetail("gamerTag") + "/avatarpic-s.png");
 	$("#bc-member-since").text(bnetClient.getUserDetail("bnetMemberSince"));
 	$("#bc-profile").show();
 };
