@@ -53,15 +53,22 @@ div#bc-settings {
 }
 
 div#bc-profile-banner {
-	position:relative;
-	top:3px;
-	left:3px;
+
 	background-size: 100% Auto;
+	box-shadow: inset 0 0 50px #000000;
 }
 
 div#bc-profile-banner  img {
+	position:relative;
+	top:3px;
+	left:3px;
 	height:48px;
 	width:48px;
+}
+
+div#bc-profile-banner ul {
+	position: relative;
+	left: 3px;
 }
 
 li.bc-minor-detail {
