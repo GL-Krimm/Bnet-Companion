@@ -31,9 +31,13 @@ bcInterface.renderSelectedView = function(pageId) {
 };
 
 bcInterface.renderProfile = function() {
-	$("#bc-page-title").text("Profile: " + bnetClient.getUserName());
+	$("#bc-page-title").text("Profile: " + bnetClient.getUserDetail("bnetUserName"));
+	$("#bc-forum-rank").text(bnetClient.getUserDetail("bnetRank"));
 	$("#bc-profile-img").attr('src', 'http://www.bungie.net/Forums/skins/default/avatars/sep.jpg');
-	$("#bc-profile-name").text(bnetClient.getUserName());
+	$("#bc-profile-name").text(bnetClient.getUserDetail("bnetUserName"));
+	console.log(bnetClient.getUserDetail("bnetBanner"));
+	$("#bc-profile-banner").css("background-image", "url(" + bnetClient.getUserDetail("bnetBanner") + ")" );
+	$("#bc-member-since").text(bnetClient.getUserDetail("bnetMemberSince"));
 	$("#bc-profile").show();
 };
 

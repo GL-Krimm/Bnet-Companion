@@ -52,6 +52,23 @@ div#bc-settings {
 	
 }
 
+div#bc-profile-banner {
+	position:relative;
+	top:3px;
+	left:3px;
+	background-size: 100% Auto;
+}
+
+div#bc-profile-banner  img {
+	height:48px;
+	width:48px;
+}
+
+li.bc-minor-detail {
+	font-size: 0.8em;
+	color: gray;
+}
+
 span.span-button {
 	display:inline-block;
 	cursor:pointer;

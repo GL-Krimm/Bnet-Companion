@@ -1,6 +1,6 @@
 var bnetClient = new BnetCompanion();
 
-bnetClient.fetchUserName();
+bnetClient.fetchBnetProfileData();
 bnetClient.updateNews();
 var t = setInterval(bnetClient.updateNews, 30000);
 
@@ -116,7 +116,11 @@ function BnetCompanion() {
 		return localStorage.userName;
 	};
 	
-	this.fetchUserName = function() {
+	this.getUserDetail = function(key) {
+		return localStorage[key];
+	}
+	
+	this.fetchBnetProfileData = function() {
 		$.ajax({
 			url:"http://www.bungie.net/account/profile.aspx",
 			method:"GET",
@@ -128,12 +132,21 @@ function BnetCompanion() {
 				
 				var elem = $(doc).find('title')[0].text;
 				if ( elem.indexOf("Profile") > 0 ) {
-					elem = elem.split(" ");
-					var name = $.trim(elem[elem.length - 1]);
-					localStorage.userName = name;
+					extractUserName($(doc).find("#ctl00_mainContent_header_lblUsername"));
+					
+					extractAvatar($(doc).find("#ctl00_mainContent_header_imgSelectedAvatar"));
+					extractBanner($(doc).find("#ctl00_mainContent_header_divContentBG"));
+					extractForumRank($(doc).find("#ctl00_mainContent_header_forumPopover"));
+					extractLastActive($(doc).find("#ctl00_mainContent_header_lblLastActive"));
+					extractMemberSince($(doc).find("#ctl00_mainContent_lblMemberSince2"));
 				} else {
-					localStorage.userName = "";
-				}				
+					localStorage.userName = localStorage.userName ? localStorage.userName : "Unknown"	
+					localStorage.bnetAvatar = localStorage.bnetAvatar ? localStorage.bnetAvatar : ""
+					localStorage.bnetBanner = localStorage.bnetBanner ? localStorage.bnetBanner : "http://www.bungie.net/images/Forums/UserSkins/default.jpg"
+					localStorage.bnetRank = localStorage.bnetRank ? localStorage.bnetRank : "";
+					localStorage.bnetLastActive = localStorage.bnetLastActive ? localStorage.bnetLastActive : "Unknown";
+					
+				}		
 			}
 		});
 	};
@@ -269,8 +282,6 @@ function BnetCompanion() {
 		return feed;
 	}	
 	
-	
-	
 	function processXmlData(data) {
 		var feedData = new Array();
 		console.log(data.toString());
@@ -283,6 +294,45 @@ function BnetCompanion() {
 			feedData.push(item);
 		});
 		return feedData;
+	}
+	
+	function extractUserName(elem) {	
+		localStorage.bnetUserName = $(elem).text();
+	}
+	
+	function extractAvatar(elem) {;
+		localStorage.bnetAvatar = "http://www.bungie.net" + $(elem).attr('src');
+		console.log(localStorage.bnetAvatar);
+	}
+	
+	function extractBanner(elem) {
+		var bannerUrl = $(elem).css('background-image');
+		// the value is relative, so chrome tries to be smart and treat it
+		// as an in-extension resource. split it and rebuild the string
+		// to point to the appropriate host
+		bannerUrl = bannerUrl.split("images")[1];
+		bannerUrl = "http://www.bungie.net/images" + bannerUrl;
+		localStorage.bnetBanner = bannerUrl.replace(")", "");
+		console.log(localStorage.bnetBanner);
+	}
+	
+	function extractForumRank(elem) {
+		var ulElem = $(elem).find('ul');
+		console.log(ulElem);
+		$(ulElem).find('li').each(function() {
+			if ( $(this).children().length == 0 ) {
+				localStorage.bnetRank = $(this).text();
+			}
+		});
+		console.log(localStorage.bnetRank );
+	}
+	
+	function extractLastActive(elem) {
+		localStorage.bnetLastActive = elem.text();
+	}
+	
+	function extractMemberSince(elem) {
+		localStorage.bnetMemberSince = elem.text();
 	}
 	
 	var twitter = {};
