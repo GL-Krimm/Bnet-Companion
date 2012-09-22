@@ -21,8 +21,8 @@ bcInterface.renderSelectedView = function(pageId) {
 		case "profile": {
 			bcInterface.renderProfile();
 		} break;
-		case "settings" : {
-			bcInterface.renderSettings();
+		case "more" : {
+			bcInterface.renderMorePage();
 		} break;
 		default:{
 		} break;
@@ -54,8 +54,8 @@ bcInterface.renderProfile = function() {
 	$("#bc-profile").show();
 };
 
-bcInterface.renderSettings = function() {
-	$("#bc-page-title").text("Settings");
+bcInterface.renderMorePage = function() {
+	$("#bc-page-title").text("More");
 
 	$("#bc-settings").children().remove();
 	var signedIn = bnetClient.signedIntoTwitter() 
@@ -188,6 +188,11 @@ $(document).ready(function() {
 	$('.bc-nav-item').click(function() {
 		$('.bc-nav-item').removeClass('bc-nav-active');
 		$(this).addClass('bc-nav-active');
+		$($("#bc-footer").find('img')).each(function() {
+			$(this).attr('src', $(this).attr('src').replace("-selected", ""));
+		});
+		$(this).find('img').attr('src', "images/" + $(this).attr('intRef') + "-selected.png");
+		
 		$('#bc-content').children().hide();
 		bcInterface.renderSelectedView($(this).attr('intRef'));
 	});
