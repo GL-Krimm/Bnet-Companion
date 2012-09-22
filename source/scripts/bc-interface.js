@@ -41,11 +41,18 @@ bcInterface.renderSelectedView = function(pageId) {
 bcInterface.renderProfile = function() {
 	$("#bc-page-title").text("Profile");
 	$("#bc-forum-rank").text(bnetClient.getUserDetail("bnetRank"));
+	var name = bnetClient.getUserDetail("bnetUserName");
 	$("#bc-profile-img").attr('src', bnetClient.getUserDetail("bnetAvatar"));
-	$("#bc-profile-name").text(bnetClient.getUserDetail("bnetUserName"));
+	$("#bc-profile-name").text(name);
 	console.log(bnetClient.getUserDetail("bnetBanner"));
 	$("#bc-profile-banner").css("background-image", "url(" + bnetClient.getUserDetail("bnetBanner") + ")" );
-	$("#bc-xbl-avatar").attr('src', "http://avatar.xboxlive.com/avatar/" + bnetClient.getUserDetail("gamerTag") + "/avatarpic-s.png");
+	
+	if ( name && name != "Unknown") {
+		$("#bc-xbl-avatar").attr('src', "http://avatar.xboxlive.com/avatar/" + bnetClient.getUserDetail("gamerTag") + "/avatarpic-s.png");
+	} else {
+		$("#bc-xbl-avatar").attr('src', "images/profile.png");
+	}
+	
 	$("#bc-gamertag").text(bnetClient.getUserDetail("gamerTag"));
 	$("#bc-member-since").text(bnetClient.getUserDetail("bnetMemberSince"));
 	

@@ -144,7 +144,7 @@ function BnetCompanion() {
 					extractXblFriendsOnline($(doc).find("#ctl00_dashboardNav_loggedInNormal"));
 				} else {
 					localStorage.userName = localStorage.userName ? localStorage.userName : "Unknown"	
-					localStorage.bnetAvatar = localStorage.bnetAvatar ? localStorage.bnetAvatar : ""
+					localStorage.bnetAvatar = localStorage.bnetAvatar ? localStorage.bnetAvatar : "images/profile.png"
 					localStorage.bnetBanner = localStorage.bnetBanner ? localStorage.bnetBanner : "http://www.bungie.net/images/Forums/UserSkins/default.jpg"
 					localStorage.bnetRank = localStorage.bnetRank ? localStorage.bnetRank : "";
 					localStorage.bnetLastActive = localStorage.bnetLastActive ? localStorage.bnetLastActive : "Unknown";
