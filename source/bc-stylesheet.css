@@ -80,18 +80,22 @@ div#bc-profile-banner ul {
 	padding-top: 0.5em;
 }
 
-ul#bc-profile-nav {
+ul.bc-nav-list {
 	cursor: pointer;
+	display:inline-block;
 	list-style-type: none;
-	position: relative;
 	width: 90%;
 	margin: auto;
+	position: relative;
 	margin-top: 3em;
+	margin-left:0.8em;
+	
 	border: 1px groove;
 	background-color: rgba(58,58,58,0.8);
 	border-radius:5px;
 }
-ul#bc-profile-nav li {
+
+ul.bc-nav-list li {
 	padding: 5px;
 }
 
@@ -102,7 +106,7 @@ ul#bc-profile-nav li  img{
 	
 }
 
-ul#bc-profile-nav li  span {
+ul.bc-nav-list li  span {
 	position: relative;
 	margin-left:3px;
 	top: -6px;

@@ -13,6 +13,14 @@ bcInterface.mockNews = JSON.stringify(bcInterface.mockNews);
 bcInterface.rssUrl = "http://www.bungie.net/News/NewsRss.ashx";
 bcInterface.twitterFeedUrl = "http://api.twitter.com/1/statuses/user_timeline.rss?user_id=26280712&count=20"
 
+bcInterface.openElemRef = function(elem) {
+	if ( $(elem).attr('exref') && $(elem).attr('exref').length > 0 ) {
+		window.open($(elem).attr('exref'));
+	} else if ( $(elem).attr('intRef') && $(elem).attr('intRef').length > 0 ) {
+		bcInterface.renderSelectedView($(elem).attr('intRef'));
+	}
+};
+
 bcInterface.renderSelectedView = function(pageId) {
 	switch (pageId) {
 		case "news": {
@@ -57,6 +65,9 @@ bcInterface.renderProfile = function() {
 bcInterface.renderMorePage = function() {
 	$("#bc-page-title").text("More");
 
+	$("#bc-more").show();
+	
+/*	
 	$("#bc-settings").children().remove();
 	var signedIn = bnetClient.signedIntoTwitter() 
 	var elemId = signedIn ? 'bc-twitter-disconnect' : 'bc-twitter-connect';
@@ -76,7 +87,7 @@ bcInterface.renderMorePage = function() {
 	});
 	
 	$("#bc-settings").show();
-
+*/
 };
 
 bcInterface.renderNewsFeed = function(newsData) {
@@ -104,8 +115,10 @@ bcInterface.renderNewsFeed = function(newsData) {
 		$('#bc-news').append(htmlString).show();
 	}
 	
-	$('.bc-news-item ').click(function() {
-		window.open($(this).attr('exref'));
+	// using a different class name selector here to prevent other buttons
+	// from having two click handlers subscribed, thus opening a ref twice
+	$('.bc-news-item').click(function() {
+		bcInterface.openElemRef($(this));
 	});
 }
 
@@ -195,6 +208,13 @@ $(document).ready(function() {
 		
 		$('#bc-content').children().hide();
 		bcInterface.renderSelectedView($(this).attr('intRef'));
+	});
+	
+	$(".bc-button").click(function() {
+		console.log('got click');
+		if ( $(this).attr('exref').length > 0 ) {
+			window.open($(this).attr('exref'));
+		}
 	});
 	
 	bcInterface.renderNewsFeed( bcInterface.debug ? bcInterface.mockNews : bnetClient.getNewsFeed() );
