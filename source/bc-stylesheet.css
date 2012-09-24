@@ -36,8 +36,8 @@ h1#bc-page-title {
 
 span#bc-back-more {
 	cursor:pointer;
-	display: inline;
-	float: left;
+	position:relative;
+	top:-1em;
 }
 
 #bc-content {

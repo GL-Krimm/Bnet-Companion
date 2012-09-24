@@ -38,7 +38,7 @@ bcInterface.renderSelectedView = function(pageId) {
 			bcInterface.renderMorePage();
 		} break;
 		default:{
-			$('#bc-header').prepend(span({cssClass:'bc-button', id:'bc-back-more', intRef:'more'}, "<"));
+			$('#bc-header').prepend(span({cssClass:'bc-button', id:'bc-back-more', intRef:'more'}, "< More"));
 			
 			$("#bc-back-more").click(function() {
 				bcInterface.renderSelectedView('more');
