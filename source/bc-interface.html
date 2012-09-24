@@ -3,7 +3,7 @@
 		<link href='bc-stylesheet.css' media='screen' rel='stylesheet' />
 	</head>
 	<body class='bc-body'>
-		<div id='bc-header' align='center' >
+		<div id='bc-header'>
 			<h1 id='bc-page-title'>Bungie News</h1>
 		</div>
 		<div id='bc-content' align='center'>
@@ -68,7 +68,7 @@
 							</strong>
 						</span>
 					</li>
-					<li class='bottom-border bc-button'>
+					<li class='bottom-border bc-button' intRef='privacy'>
 						<img src='images/message.png' />
 						<span>
 							Privacy Policy
@@ -79,7 +79,7 @@
 							</strong>
 						</span>
 					</li>
-					<li class='bottom-border bc-more'>
+					<li class='bottom-border bc-more bc-button' intRef='tou'>
 						<img src='images/power.png' />
 						<span>
 							Terms of Use
@@ -90,7 +90,7 @@
 							</strong>
 						</span>
 					</li>
-					<li class='bc-more'>
+					<li class='bc-more bc-button' intRef='about'>
 						<img src='images/power.png' />
 						<span>
 							About
@@ -102,6 +102,36 @@
 						</span>
 					</li>					
 				</ul>
+			</div>
+			<div id='bc-privacy' class='scroll hidden'>
+				<p>
+					Bungie Browser stores basic information about your Bungie.net profile and your Twitter profile, should you choose to connect Bungie Browser to either of these services.
+				</p>
+				</br>
+				<p>
+					Bungie Browser does not log, compile, share, or otherwise send your personal information to others.
+				</p>
+				</br>
+				<p>
+					Use of some features, such as retweeting or replying to Tweets via Bungie Browser, should you choose to use these features, may indicate Bungie Browser as the source of the Tweet.
+					Per Twitter's functionality and design, your Twitter name may be exposed in any Tweet replys or Retweets to Tweets from Bungie Inc.
+				</p>
+			</div>
+			<div id='bc-tou' class='scroll hidden' >
+				<p>
+					Bungie, Bungie Mobile, Bungie.net, and all related assets such as images, brand names, and logos, are the sole property of Bungie Inc. 
+					Registered trademarked names, images, logos, and assets are used in accordance with Bungie Inc's rights and guidelines, with approval from Bungie.
+				</p>
+				</br>
+				<p>
+					Bungie Browser is free of charge, and cannot be re-distributed for charge or donation.
+				</p>
+			</div>
+			<div id='bc-about' class='scroll hidden'>
+				<p>
+					Bungie Browser is written by Brandon McMullin, who claims no afiliation with Bungie Inc. 
+					Bungie Browser is a port of the Bungie Mobile app for Android and iPhone, and is distributed for free with the permission of Bungie Inc.
+				</p>
 			</div>
 		</div>
 		<div id='bc-footer' align='center'>

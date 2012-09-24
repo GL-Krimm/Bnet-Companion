@@ -1,6 +1,7 @@
 var bnetClient = chrome.extension.getBackgroundPage().bnetClient;
 
 window.bcInterface = {};
+bcInterface.prevPageRef = 'news';
 
 bcInterface.debug = false;
 
@@ -17,11 +18,15 @@ bcInterface.openElemRef = function(elem) {
 	if ( $(elem).attr('exref') && $(elem).attr('exref').length > 0 ) {
 		window.open($(elem).attr('exref'));
 	} else if ( $(elem).attr('intRef') && $(elem).attr('intRef').length > 0 ) {
+		
 		bcInterface.renderSelectedView($(elem).attr('intRef'));
 	}
 };
 
 bcInterface.renderSelectedView = function(pageId) {
+	$('#bc-content').children().hide();
+	$("#bc-back-more").remove();
+	
 	switch (pageId) {
 		case "news": {
 			bcInterface.renderNewsFeed( bcInterface.debug ? bcInterface.mockNews : bnetClient.getNewsFeed() );
@@ -33,6 +38,15 @@ bcInterface.renderSelectedView = function(pageId) {
 			bcInterface.renderMorePage();
 		} break;
 		default:{
+			$('#bc-header').prepend(span({cssClass:'bc-button', id:'bc-back-more', intRef:'more'}, "<"));
+			
+			$("#bc-back-more").click(function() {
+				bcInterface.renderSelectedView('more');
+			});
+			
+			$('#bc-page-title').text(pageId);
+			$('#bc-content').children().hide();
+			$('#bc-' + pageId).show();
 		} break;
 	}
 	return false;
@@ -212,16 +226,13 @@ $(document).ready(function() {
 			$(this).attr('src', $(this).attr('src').replace("-selected", ""));
 		});
 		$(this).find('img').attr('src', "images/" + $(this).attr('intRef') + "-selected.png");
-		
-		$('#bc-content').children().hide();
+	
 		bcInterface.renderSelectedView($(this).attr('intRef'));
 	});
 	
 	$(".bc-button").click(function() {
 		console.log('got click');
-		if ( $(this).attr('exref').length > 0 ) {
-			window.open($(this).attr('exref'));
-		}
+		bcInterface.openElemRef($(this));
 	});
 	
 	bcInterface.renderNewsFeed( bcInterface.debug ? bcInterface.mockNews : bnetClient.getNewsFeed() );
