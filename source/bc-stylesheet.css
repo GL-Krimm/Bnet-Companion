@@ -36,8 +36,10 @@ h1#bc-page-title {
 
 span#bc-back-more {
 	cursor:pointer;
-	position:relative;
-	top:-1em;
+	position:fixed;
+	display:inline;
+	top:0.2em;
+	left:0.5em;
 }
 
 #bc-content {
@@ -120,6 +122,11 @@ ul.bc-nav-list {
 
 ul.bc-nav-list li {
 	padding: 5px;
+}
+
+ul.bc-nav-list li img {
+	height: 24px;
+	width: 24px;
 }
 
 ul#bc-profile-nav li  img{

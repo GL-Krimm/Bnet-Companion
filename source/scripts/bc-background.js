@@ -56,6 +56,7 @@ function BnetCompanion() {
 	};
 	
 	this.requestToken = function() {
+		console.log("requesting token...");
 		var callbackString = window.top.location + "?t=" + Date.now();
 		var result = OAuthSimple().sign({
 			action:"GET",

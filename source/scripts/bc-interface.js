@@ -25,7 +25,6 @@ bcInterface.openElemRef = function(elem) {
 
 bcInterface.renderSelectedView = function(pageId) {
 	$('#bc-content').children().hide();
-	$("#bc-back-more").remove();
 	
 	switch (pageId) {
 		case "news": {
@@ -37,16 +36,41 @@ bcInterface.renderSelectedView = function(pageId) {
 		case "more" : {
 			bcInterface.renderMorePage();
 		} break;
-		default:{
-			$('#bc-header').prepend(span({cssClass:'bc-button', id:'bc-back-more', intRef:'more'}, "< More"));
+		case "settings" : {
+			$('#bc-page-title').text($("#bc-" + pageId).attr('intName'));
+			$('#bc-' + pageId).show();
+			
+			if ( bcInterface.signedIntoTwitter() ) {
+				$("#bc-twitter-btn").text("Disconnect from Twitter");
+				
+				$("#bc-twitter-btn").click(function() {
+					bcInterface.twitterSignOut();
+				});
+			} else {
+				$("#bc-twitter-btn").click(function() {
+					bcInterface.requestToken();
+				});
+			}
+			
+			$("#bc-content").append(span({cssClass:'bc-button', id:'bc-back-more'}, "< More")).show();
 			
 			$("#bc-back-more").click(function() {
+				$("#bc-back-more").remove();
 				bcInterface.renderSelectedView('more');
 			});
 			
-			$('#bc-page-title').text(pageId);
-			$('#bc-content').children().hide();
+		} break;
+		default:{
+			$('#bc-page-title').text($("#bc-" + pageId).attr('intName'));
 			$('#bc-' + pageId).show();
+			
+			$("#bc-content").append(span({cssClass:'bc-button', id:'bc-back-more'}, "< More")).show();
+			
+			$("#bc-back-more").click(function() {
+				$("#bc-back-more").remove();
+				bcInterface.renderSelectedView('more');
+			});
+						
 		} break;
 	}
 	return false;
