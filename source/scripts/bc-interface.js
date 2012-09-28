@@ -1,7 +1,6 @@
 var bnetClient = chrome.extension.getBackgroundPage().bnetClient;
 
 window.bcInterface = {};
-bcInterface.profile = bnetClient.getBnetProfile();
 bcInterface.prevPageRef = 'news';
 
 bcInterface.debug = false;
@@ -78,33 +77,61 @@ bcInterface.renderSelectedView = function(pageId) {
 };
 
 bcInterface.renderProfile = function() {
-	$("#bc-page-title").text("Profile");
-	$("#bc-forum-rank").text(bnetClient.getBnetProfile().bnetRank);
-	var name = bnetClient.getUserDetail("bnetUserName");
-	$("#bc-profile-img").attr('src', bnetClient.getUserDetail("bnetAvatar"));
-	$("#bc-profile-name").text(name);
-	console.log(bnetClient.getUserDetail("bnetBanner"));
-	$("#bc-profile-banner").css("background-image", "url(" + bnetClient.getUserDetail("bnetBanner") + ")" );
+	var profile = bnetClient.getBnetProfile();
+	var listId = "bc-profile-nav";
+	var profileDivId = "#bc-profile";
 	
-	if ( name && name != "Unknown") {
-		$("#bc-xbl-avatar").attr('src', "http://avatar.xboxlive.com/avatar/" + bnetClient.getUserDetail("gamerTag") + "/avatarpic-s.png");
+	
+
+	if ( profile.signedIn ) {
+		$("#bc-page-title").text("Profile");
+		var avatarImg = "http://avatar.xboxlive.com/avatar/" + profile.gamerTag + "/avatarpic-s.png";
+
+		$(profileDivId).append(
+							div({id:'bc-profile-banner'}, 
+								img(null, profile.avatar) +
+								br() +
+								ul({id:'bc-profile-details'},
+									li(null, profile.gamerTag) +
+									li({cssClass:'pad-top bc-minor-detail'}, profile.bnetRank) +
+									li({cssClass:'pad-top bc-minor-detail'}, "Member Since:" +
+											span(null, profile.memberSince)
+									)
+								)
+							)
+						);
+	
+		$("#bc-profile-banner").css("background-image", "url(" + profile.bannerImg + ")" );
+				
+		$(profileDivId).append(
+			ul({id:'bc-profile-nav', cssClass:'bc-nav-list'}, "")
+		);		
+		
+		var avatarImg = "http://avatar.xboxlive.com/avatar/" + profile.gamerTag + "/avatarpic-s.png";
+		addNavListButton(listId, 'bc-xbl-friends', avatarImg, profile.gamerTag, true, profile.numFriendsOnline);
+				
+		addNavListButton(listId, 'bc-bnet-messages', 'images/message.png', "Bungie Messages", true, profile.messageCount);	
+		
+		addNavListButton(listId, 'bc-bnet-sign-out', 'images/power.png', "Sign Out", false, null, function() {
+			bnetClient.bnetSignOut();
+			$(profileDivId).children().remove();
+			bcInterface.renderSelectedView("profile");
+		});
+		
 	} else {
-		$("#bc-xbl-avatar").attr('src', "images/profile.png");
+	
+		$(profileDivId).append(
+			ul({id:'bc-profile-nav', cssClass:'bc-nav-list'}, "")
+		);	
+		
+		addNavListButton('bc-profile-nav', 'bc-sign-in', 'images/power.png', 'Connect to Bnet', false, null, function() {
+			bnetClient.fetchBnetProfileData();
+			$(profileDivId).children().remove();
+			bcInterface.renderSelectedView("profile");
+		});
 	}
 	
-	$("#bc-gamertag").text(bnetClient.getUserDetail("gamerTag"));
-	$("#bc-member-since").text(bnetClient.getUserDetail("bnetMemberSince"));
-	
-	var msgCount = bnetClient.getUserDetail("bnetMessageCount");
-	if ( msgCount > 0 ) {
-		$("#bc-message-count").text(msgCount).append("<strong> ></strong>");
-	}
-	//xblFriendsOnline
-	var friendCount = bnetClient.getUserDetail("xblFriendsOnline");
-	if ( friendCount > 0 ) {
-		$("#bc-friend-count").text(friendCount).append("<strong> ></strong>");
-	}		
-	
+
 	$("#bc-profile").show();
 };
 
@@ -112,28 +139,6 @@ bcInterface.renderMorePage = function() {
 	$("#bc-page-title").text("More");
 
 	$("#bc-more").show();
-	
-/*	
-	$("#bc-settings").children().remove();
-	var signedIn = bnetClient.signedIntoTwitter() 
-	var elemId = signedIn ? 'bc-twitter-disconnect' : 'bc-twitter-connect';
-	var htmlStr = span({id:elemId, cssClass:'span-button'},
-		signedIn ? "Disconnect from Twitter" : "Connect to Twitter"
-	);
-	
-	$("#bc-settings").append(htmlStr);
-	
-	$("#bc-twitter-connect").click(function() {
-		bnetClient.requestToken();
-	});
-	
-	$("#bc-twitter-disconnect").click(function() {
-		bnetClient.twitterSignOut();
-		bcInterface.renderSettings();
-	});
-	
-	$("#bc-settings").show();
-*/
 };
 
 bcInterface.renderNewsFeed = function(newsData) {
@@ -213,6 +218,10 @@ function li(opts, text) {
 	return elem("li", text, opts);
 }
 
+function strong(opts, text) {
+	return elem("strong", text, opts);
+}
+
 function span(opts, text) {
 	return elem("span", text, opts);
 } 
@@ -241,6 +250,28 @@ function p(opts, text) {
 
 function br() {
 	return "</br>"
+}
+
+function addNavListButton(listId, buttonId, imgSrc, btnText, bottom, count, onClick ) {
+	
+	var countStr = count ? count + " " : ""
+	var classOption = bottom ? "bottom-border" : ""
+	
+	var btnStr = li({id:buttonId, cssClass:classOption}, 
+						img(null, imgSrc) +
+						span(null, btnText) +
+						span({cssClass:'right'}, 
+							countStr + 
+							strong(null, ">")
+						)
+					);
+					
+	$("#" + listId).append(btnStr);
+	
+	$("#" + buttonId).click(function() {
+		onClick();
+	});
+	
 }
 
 $(document).ready(function() {

@@ -1,6 +1,5 @@
 var bnetClient = new BnetCompanion();
 
-bnetClient.fetchBnetProfileData();
 bnetClient.updateNews();
 var t = setInterval(bnetClient.updateNews, 30000);
 
@@ -117,12 +116,11 @@ function BnetCompanion() {
 		window.localStorage.removeItem('requestTokenSecret');
 	};
 	
-	this.getUserName = function() {
-		return localStorage.userName;
-	};
-	
-	this.getUserDetail = function(key) {
-		return localStorage[key];
+	this.bnetSignOut = function() {
+		bnetProfile = {};
+		bnetProfile.signedIn = false;
+		localStorage.bnetProfile = JSON.stringify(bnetProfile);
+		console.log("logging out");
 	};
 	
 	this.fetchBnetProfileData = function() {
@@ -137,6 +135,7 @@ function BnetCompanion() {
 				
 				var elem = $(doc).find('title')[0].text;
 				if ( elem.indexOf("Profile") > 0 ) {
+					bnetProfile.signedIn = true;
 					extractUserName($(doc).find("#ctl00_mainContent_header_lblUsername"));
 					
 					extractAvatar($(doc).find("#ctl00_mainContent_header_imgSelectedAvatar"));
@@ -348,7 +347,7 @@ function BnetCompanion() {
 	}
 	
 	function extractMemberSince(elem) {
-		bnetProfile.membersince = elem.text();
+		bnetProfile.memberSince = elem.text();
 	}
 	
 	function extractGamerTag(elem) {
@@ -369,6 +368,7 @@ function BnetCompanion() {
 	}
 	
 	var bnetProfile = {};
+	bnetProfile.signedIn = false;
 	var twitter = {};
 	twitter.consumerKey = "lwCCH94saDQSOqEcuGD7w";
 	twitter.consumerSecret = "Au2wXTBYyEyaDW2lv1jMDAtFj6aUhyRBxYf9h9YfA";	
