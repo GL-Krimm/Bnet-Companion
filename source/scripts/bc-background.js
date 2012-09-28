@@ -16,6 +16,10 @@ function BnetCompanion() {
 		return localStorage.newsFeed;
 	};
 	
+	this.getBnetProfile = function() {
+		return JSON.parse(localStorage.bnetProfile);
+	};
+	
 	this.updateNews = function() {
 		var news = getNews();
 		
@@ -33,15 +37,15 @@ function BnetCompanion() {
 			localStorage.lastPubDate = news[0].pubDate;
 		}
 		
-		console.log('updated news');	
+		//console.log('updated news');	
 	};
 	
 	this.setAccessToken = function(token) {
 		localStorage.accessToken = token;
-	}
+	};
 	
 	this.signedIntoTwitter = function() {
-		console.log("checking if signed in: " + localStorage.accessToken);
+		//console.log("checking if signed in: " + localStorage.accessToken);
 		var signedIn = false;
 		
 		if ( null != localStorage.accessToken && localStorage.accessToken.length > 0 ) {
@@ -52,11 +56,11 @@ function BnetCompanion() {
 	};
 	
 	this.log = function(msg) {
-		console.log(msg);
+		//console.log(msg);
 	};
 	
 	this.requestToken = function() {
-		console.log("requesting token...");
+		//console.log("requesting token...");
 		var callbackString = window.top.location + "?t=" + Date.now();
 		var result = OAuthSimple().sign({
 			action:"GET",
@@ -74,7 +78,7 @@ function BnetCompanion() {
 			}
 		});
 		
-		console.log(result.signed_url);
+		//console.log(result.signed_url);
 		
 		$.ajax({
 			url:result.signed_url,
@@ -91,7 +95,7 @@ function BnetCompanion() {
 							localStorage.requestTokenSecret = node[1];
 						} break;
 						default : {
-							console.log("some other data: " + node[0]);
+							//console.log("some other data: " + node[0]);
 						} break;
  					}
 					
@@ -119,7 +123,7 @@ function BnetCompanion() {
 	
 	this.getUserDetail = function(key) {
 		return localStorage[key];
-	}
+	};
 	
 	this.fetchBnetProfileData = function() {
 		$.ajax({
@@ -155,11 +159,12 @@ function BnetCompanion() {
 				}		
 			}
 		});
+		localStorage.bnetProfile = JSON.stringify(bnetProfile);
 	};
 	
 	/* ============ "private" methods ================= */
 	function getNews() {
-		console.log('getting news');
+		//console.log('getting news');
 		var news = new Array();
 		
 		news = getFeedXml("http://www.bungie.net/News/NewsRss.ashx");
@@ -167,10 +172,10 @@ function BnetCompanion() {
 		var bungieUrl = "http";
 		
 		if ( localStorage.accessToken ) {
-			console.log("Getting authed bungie feed");
+			//console.log("Getting authed bungie feed");
 			news = news.concat(getTwitterFeed());
 		} else {
-			console.log("Getting unauthed bungie feed");
+			//console.log("Getting unauthed bungie feed");
 			news = news.concat(getFeedXml("http://api.twitter.com/1/statuses/user_timeline.rss?user_id=26280712&count=40"));
 		}
 				
@@ -213,8 +218,8 @@ function BnetCompanion() {
 			method:"GET",
 			async:false,
 			success:function(data) {
-				console.log("got something...");
-				console.log(data);
+				//console.log("got something...");
+				//console.log(data);
 				feedData = processXmlData(data);		
 			}
 		});
@@ -230,8 +235,8 @@ function BnetCompanion() {
 			async:false,
 			dataType:"XML",
 			success:function(data) {
-				console.log("got something...");
-				console.log(data);
+				//console.log("got something...");
+				//console.log(data);
 				feedData = processXmlData(data);
 			}
 		});
@@ -290,7 +295,7 @@ function BnetCompanion() {
 	
 	function processXmlData(data) {
 		var feedData = new Array();
-		console.log(data.toString());
+		//console.log(data.toString());
 		$($(data).find('item')).each(function() {
 						
 			var item = {};
@@ -303,12 +308,14 @@ function BnetCompanion() {
 	}
 	
 	function extractUserName(elem) {	
-		localStorage.bnetUserName = $(elem).text();
+		bnetProfile.userName = $(elem).text();
+		localStorage.bnetUserName = bnetProfile.userName;
 	}
 	
 	function extractAvatar(elem) {;
-		localStorage.bnetAvatar = "http://www.bungie.net" + $(elem).attr('src');
-		console.log(localStorage.bnetAvatar);
+		bnetProfile.avatar = "http://www.bungie.net" + $(elem).attr('src');
+		localStorage.bnetAvatar = bnetProfile.avatar;
+		//console.log(localStorage.bnetAvatar);
 	}
 	
 	function extractBanner(elem) {
@@ -318,42 +325,50 @@ function BnetCompanion() {
 		// to point to the appropriate host
 		bannerUrl = bannerUrl.split("images")[1];
 		bannerUrl = "http://www.bungie.net/images" + bannerUrl;
-		localStorage.bnetBanner = bannerUrl.replace(")", "");
-		console.log(localStorage.bnetBanner);
+		bnetProfile.bannerImg = bannerUrl.replace(")", "");
+		localStorage.bnetBanner = bnetProfile.bannerImg;
+		//console.log(localStorage.bnetBanner);
 	}
 	
 	function extractForumRank(elem) {
 		var ulElem = $(elem).find('ul');
-		console.log(ulElem);
+		//console.log(ulElem);
 		$(ulElem).find('li').each(function() {
 			if ( $(this).children().length == 0 ) {
-				localStorage.bnetRank = $(this).text();
+				bnetProfile.bnetRank = $(this).text();
 			}
 		});
-		console.log(localStorage.bnetRank );
+		localStorage.bnetRank = bnetProfile.bnetRank;
+		//console.log(localStorage.bnetRank );
 	}
 	
 	function extractLastActive(elem) {
-		localStorage.bnetLastActive = elem.text();
+		bnetProfile.lastActive = elem.text();
+		localStorage.bnetLastActive = bnetProfile.lastActive;
 	}
 	
 	function extractMemberSince(elem) {
-		localStorage.bnetMemberSince = elem.text();
+		bnetProfile.membersince = elem.text();
 	}
 	
 	function extractGamerTag(elem) {
-		localStorage.gamerTag = elem.text().split(": ")[1];
-		console.log(localStorage.gamerTag);
+		bnetProfile.gamerTag = elem.text().split(": ")[1];
+		localStorage.gamerTag = bnetProfile.gamerTag;
+		//console.log(bnetProfile.gamerTag);
 	}
 	
 	function extractXblFriendsOnline(elem) {
-		localStorage.xblFriendsOnline = parseInt($(elem).find("li.friendsOnline").find('a').text());
+		bnetProfile.numFriendsOnline = parseInt($(elem).find("li.friendsOnline").find('a').text());
+		localStorage.xblFriendsOnline = bnetProfile.numFriendsOnline;
 	}
 	
 	function extractNewMessageCount(elem) {
-		localStorage.bnetMessageCount = parseInt($(elem).find("li.messages").find('a').text());
+		bnetProfile.messageCount = parseInt($(elem).find("li.messages").find('a').text());
+		localStorage.bnetMessageCount = bnetProfile.messageCount;
+		//console.log(bnetProfile.messageCount);
 	}
 	
+	var bnetProfile = {};
 	var twitter = {};
 	twitter.consumerKey = "lwCCH94saDQSOqEcuGD7w";
 	twitter.consumerSecret = "Au2wXTBYyEyaDW2lv1jMDAtFj6aUhyRBxYf9h9YfA";	

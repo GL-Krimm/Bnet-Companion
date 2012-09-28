@@ -35,11 +35,19 @@ h1#bc-page-title {
 }
 
 span#bc-back-more {
+	padding-left:2px;
+	padding-right:2px;
 	cursor:pointer;
 	position:fixed;
+	background-color:#161616;
+	border-radius:2px;
 	display:inline;
 	top:0.2em;
 	left:0.5em;
+}
+
+span#bc-back-more:hover {
+	border:1px groove;
 }
 
 #bc-content {

@@ -1,6 +1,7 @@
 var bnetClient = chrome.extension.getBackgroundPage().bnetClient;
 
 window.bcInterface = {};
+bcInterface.profile = bnetClient.getBnetProfile();
 bcInterface.prevPageRef = 'news';
 
 bcInterface.debug = false;
@@ -25,6 +26,7 @@ bcInterface.openElemRef = function(elem) {
 
 bcInterface.renderSelectedView = function(pageId) {
 	$('#bc-content').children().hide();
+	$("#bc-back-more").remove();
 	
 	switch (pageId) {
 		case "news": {
@@ -38,24 +40,23 @@ bcInterface.renderSelectedView = function(pageId) {
 		} break;
 		case "settings" : {
 			$('#bc-page-title').text($("#bc-" + pageId).attr('intName'));
-			$('#bc-' + pageId).show();
+			$('#bc-' + pageId).show();			
 			
-			if ( bcInterface.signedIntoTwitter() ) {
+			if ( bnetClient.signedIntoTwitter() ) {
 				$("#bc-twitter-btn").text("Disconnect from Twitter");
 				
 				$("#bc-twitter-btn").click(function() {
-					bcInterface.twitterSignOut();
+					bnetClient.twitterSignOut();
 				});
 			} else {
 				$("#bc-twitter-btn").click(function() {
-					bcInterface.requestToken();
+					bnetClient.requestToken();
 				});
-			}
+			}			
 			
 			$("#bc-content").append(span({cssClass:'bc-button', id:'bc-back-more'}, "< More")).show();
 			
 			$("#bc-back-more").click(function() {
-				$("#bc-back-more").remove();
 				bcInterface.renderSelectedView('more');
 			});
 			
@@ -78,7 +79,7 @@ bcInterface.renderSelectedView = function(pageId) {
 
 bcInterface.renderProfile = function() {
 	$("#bc-page-title").text("Profile");
-	$("#bc-forum-rank").text(bnetClient.getUserDetail("bnetRank"));
+	$("#bc-forum-rank").text(bnetClient.getBnetProfile().bnetRank);
 	var name = bnetClient.getUserDetail("bnetUserName");
 	$("#bc-profile-img").attr('src', bnetClient.getUserDetail("bnetAvatar"));
 	$("#bc-profile-name").text(name);
