@@ -3,6 +3,8 @@ var bnetClient = new BnetCompanion();
 bnetClient.updateNews();
 var t = setInterval(bnetClient.updateNews, 30000);
 
+setInterval(bnetClient.updateOnlineFriendsCount(), 60 * 1000 * 5);
+
 function BnetCompanion() {
 
 	if ( arguments.callee._singletonInstance ) {
@@ -187,6 +189,28 @@ function BnetCompanion() {
 		localStorage.bnetProfile = JSON.stringify(bnetProfile);
 		return friends;
 	}	
+	
+	this.updateOnlineFriendsCount = function() {
+		bnetProfile = JSON.parse(localStorage.bnetProfile);
+		
+		$.ajax({
+			url:"http://www.bungie.net/account/profile.aspx",
+			method:"GET",
+			dataType:"text",
+			async:false,
+			success:function(response) {
+				var doc = document.createElement('html');
+				doc.innerHTML = response;
+				
+				var elem = $(doc).find('title')[0].text;
+				if ( elem.indexOf("Profile") > 0 ) {
+					extractXblFriendsOnline($(doc).find("#ctl00_dashboardNav_loggedInNormal"));
+				} 		
+			}
+		});	
+		
+		localStorage.bnetProfile = JSON.stringify(bnetProfile);		
+	};
 	
 	/* ============ "private" methods ================= */
 	function getNews() {
@@ -385,7 +409,6 @@ function BnetCompanion() {
 	
 	function extractXblFriendsOnline(elem) {
 		bnetProfile.numFriendsOnline = parseInt($(elem).find("li.friendsOnline").find('a').text());
-		localStorage.xblFriendsOnline = bnetProfile.numFriendsOnline;
 	}
 	
 	function extractNewMessageCount(elem) {
