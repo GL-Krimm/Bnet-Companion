@@ -135,7 +135,6 @@ function BnetCompanion() {
 				
 				var elem = $(doc).find('title')[0].text;
 				if ( elem.indexOf("Profile") > 0 ) {
-					bnetProfile.signedIn = true;
 					extractUserName($(doc).find("#ctl00_mainContent_header_lblUsername"));
 					
 					extractAvatar($(doc).find("#ctl00_mainContent_header_imgSelectedAvatar"));
@@ -146,20 +145,48 @@ function BnetCompanion() {
 					extractGamerTag($(doc).find("#ctl00_mainContent_header_gtFloatLabel"));
 					extractNewMessageCount($(doc).find("#ctl00_dashboardNav_loggedInNormal"));
 					extractXblFriendsOnline($(doc).find("#ctl00_dashboardNav_loggedInNormal"));
-				} else {
-					localStorage.userName = localStorage.userName ? localStorage.userName : "Unknown"	
-					localStorage.bnetAvatar = localStorage.bnetAvatar ? localStorage.bnetAvatar : "images/profile.png"
-					localStorage.bnetBanner = localStorage.bnetBanner ? localStorage.bnetBanner : "http://www.bungie.net/images/Forums/UserSkins/default.jpg"
-					localStorage.bnetRank = localStorage.bnetRank ? localStorage.bnetRank : "";
-					localStorage.bnetLastActive = localStorage.bnetLastActive ? localStorage.bnetLastActive : "Unknown";
-					localStorage.bnetMemberSince = localStorage.bnetMemberSince ? localStorage.bnetMemberSince : "Unknown";
-					localStorage.gamerTag = localStorage.gamerTag ? localStorage.gamerTag : "";
+					bnetProfile.signedIn = true;
+				} 		
+			}
+		});
+		
+		localStorage.bnetProfile = JSON.stringify(bnetProfile);
+	};
+	
+	this.fetchFriendsOnline = function() {
+	
+		var friends = [];
+		bnetProfile = JSON.parse(localStorage.bnetProfile);
+		
+		$.ajax({
+			url:"http://www.bungie.net/Stats/LiveFriends.aspx",
+			method:"GET",
+			dataType:"text",
+			async:false,
+			success:function(response) {
+				var doc = document.createElement('html');
+				doc.innerHTML = response;
+				
+				bnetProfile.numFriendsOnline = 0;
+				
+				$($(doc).find('.info_cont')).each(function() {
 					
-				}		
+					var friend = {};
+					
+					friend.gamerTag = $.trim($(this).find('.name').text());
+					friend.status = $.trim($(this).find('.game').text());
+					
+					if ( friend.status.toLowerCase() != 'offline' ) {
+						bnetProfile.numFriendsOnline += 1;
+					}
+					
+					friends.push(friend);
+				});				
 			}
 		});
 		localStorage.bnetProfile = JSON.stringify(bnetProfile);
-	};
+		return friends;
+	}	
 	
 	/* ============ "private" methods ================= */
 	function getNews() {

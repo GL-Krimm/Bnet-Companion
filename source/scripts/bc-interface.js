@@ -24,8 +24,7 @@ bcInterface.openElemRef = function(elem) {
 };
 
 bcInterface.renderSelectedView = function(pageId) {
-	$('#bc-content').children().hide();
-	$("#bc-back-more").remove();
+	$('#bc-content').children().remove();
 	
 	switch (pageId) {
 		case "news": {
@@ -37,28 +36,20 @@ bcInterface.renderSelectedView = function(pageId) {
 		case "more" : {
 			bcInterface.renderMorePage();
 		} break;
-		case "settings" : {
-			$('#bc-page-title').text($("#bc-" + pageId).attr('intName'));
-			$('#bc-' + pageId).show();			
-			
-			if ( bnetClient.signedIntoTwitter() ) {
-				$("#bc-twitter-btn").text("Disconnect from Twitter");
-				
-				$("#bc-twitter-btn").click(function() {
-					bnetClient.twitterSignOut();
-				});
-			} else {
-				$("#bc-twitter-btn").click(function() {
-					bnetClient.requestToken();
-				});
-			}			
-			
-			$("#bc-content").append(span({cssClass:'bc-button', id:'bc-back-more'}, "< More")).show();
-			
-			$("#bc-back-more").click(function() {
-				bcInterface.renderSelectedView('more');
-			});
-			
+		case "privacy" : {
+			bcInterface.renderPrivacyPage();
+		} break;
+		case "tou" : {
+			bcInterface.renderTermsOfUse();
+		} break;
+		case "about" : {
+			bcInterface.renderAboutPage();
+		} break;
+		case "settings" : {		
+			bcInterface.renderSettings();
+		} break;
+		case "friends" : {
+			bcInterface.renderOnlineFriends();
 		} break;
 		default:{
 			$('#bc-page-title').text($("#bc-" + pageId).attr('intName'));
@@ -77,14 +68,18 @@ bcInterface.renderSelectedView = function(pageId) {
 };
 
 bcInterface.renderProfile = function() {
+
 	var profile = bnetClient.getBnetProfile();
 	var listId = "bc-profile-nav";
-	var profileDivId = "#bc-profile";
-	
-	
+	var profileDivId = "#bc-profile";	
+		
+	$("#bc-content").append(
+		div({id:"bc-profile",style:'display:none;text-align:left;'}, "")
+	);	
 
 	if ( profile.signedIn ) {
 		$("#bc-page-title").text("Profile");
+					
 		var avatarImg = "http://avatar.xboxlive.com/avatar/" + profile.gamerTag + "/avatarpic-s.png";
 
 		$(profileDivId).append(
@@ -103,14 +98,27 @@ bcInterface.renderProfile = function() {
 	
 		$("#bc-profile-banner").css("background-image", "url(" + profile.bannerImg + ")" );
 				
-		$(profileDivId).append(
-			ul({id:'bc-profile-nav', cssClass:'bc-nav-list'}, "")
-		);		
-		
+	}
+
+	
+	$(profileDivId).append(
+		ul({id:'bc-profile-nav', cssClass:'bc-nav-list'}, "")
+	);		
+	
+	if ( profile.signedIn ) {
+	
 		var avatarImg = "http://avatar.xboxlive.com/avatar/" + profile.gamerTag + "/avatarpic-s.png";
-		addNavListButton(listId, 'bc-xbl-friends', avatarImg, profile.gamerTag, true, profile.numFriendsOnline);
+		addNavListButton(listId, 'bc-xbl-friends', avatarImg, profile.gamerTag, true, profile.numFriendsOnline, function() {
+			bcInterface.renderSelectedView('friends');
+		});
 				
-		addNavListButton(listId, 'bc-bnet-messages', 'images/message.png', "Bungie Messages", true, profile.messageCount);	
+		addNavListButton(listId, 'bc-bnet-messages', 'images/message.png', "Bungie Messages", true, profile.messageCount, function() {
+			window.open("http://www.bungie.net/Account/Profile.aspx?page=Messages");
+		});
+		
+		if ( profile.messageCount > 0 ) {
+			$("#bc-bnet-messages").attr('title', "Go to Messages on Bungie.net");
+		}
 		
 		addNavListButton(listId, 'bc-bnet-sign-out', 'images/power.png', "Sign Out", false, null, function() {
 			bnetClient.bnetSignOut();
@@ -120,15 +128,23 @@ bcInterface.renderProfile = function() {
 		
 	} else {
 	
-		$(profileDivId).append(
-			ul({id:'bc-profile-nav', cssClass:'bc-nav-list'}, "")
-		);	
+		$("#bc-content").prepend(
+			p( null, "Bnet Companion is not connected to Bungie.net. Sign into Bungie.net and allow Bnet Companion " +
+					 "to show profile information, such as online friends and new messages." )
+		);
 		
 		addNavListButton('bc-profile-nav', 'bc-sign-in', 'images/power.png', 'Connect to Bnet', false, null, function() {
 			bnetClient.fetchBnetProfileData();
 			$(profileDivId).children().remove();
 			bcInterface.renderSelectedView("profile");
 		});
+		
+		$("#bc-content").append(
+			br() + 
+			p( null, "Bnet Companion will store some basic information from Bungie.net, but does not share or otherwise "+
+					 "expose this information to others. For more details, see the Privacy Policy from the More page." )
+		);
+		
 	}
 	
 
@@ -137,13 +153,45 @@ bcInterface.renderProfile = function() {
 
 bcInterface.renderMorePage = function() {
 	$("#bc-page-title").text("More");
+	
+	$("#bc-content").append(
+		div({id:'bc-more',style:'display:none;text-align:left;'}, "")
+	);
+	
+	var listId = 'bc-more-nav';
+	$("#bc-more").append(
+		ul({id:listId, cssClass:'bc-nav-list'}, "")
+	);
+	
+	addNavListButton(listId, 'bc-bungie-button', 'images/bnet.gif', 'Bungie.net Website', true, null, function() {
+		window.open("http://www.bungie.net");
+	});
+	
+	addNavListButton(listId, 'bc-privacy-policy', 'images/carnage_zone.png', 'Privacy Policy', true, null, function() {
+		bcInterface.renderSelectedView('privacy');
+	});
 
+	addNavListButton(listId, 'bc-terms-of-use', 'images/banhammer.png', 'Terms of Use', true, null, function() {
+		bcInterface.renderSelectedView('tou');
+	});
+	
+	addNavListButton(listId, 'bc-about', 'images/septagon.png', 'About', true, null, function() {
+		bcInterface.renderSelectedView('about');
+	});	
+	
+	addNavListButton(listId, 'bc-settings', 'images/settings.png', 'Settings', false, null, function() {
+		bcInterface.renderSelectedView('settings');
+	});
+	
 	$("#bc-more").show();
 };
 
 bcInterface.renderNewsFeed = function(newsData) {
 	$("#bc-page-title").text("Bungie News");
-	$('#bc-news').children().remove();
+		
+	$("#bc-content").append(
+		ul({id:'bc-news',cssClass:'bc-news-list'})
+	);
 	
 	newsData = JSON.parse(newsData);
 	for ( var i = 0; i < newsData.length; i++ )
@@ -173,6 +221,111 @@ bcInterface.renderNewsFeed = function(newsData) {
 	});
 }
 
+bcInterface.renderAboutPage = function() {
+	$("#bc-title").text("About");
+
+	addBackButton('more');
+	
+	$("#bc-content").append(
+		div({id:'bc-about',cssClass:'scroll'})
+	);
+	
+	$("#bc-about").append(
+		p(null, "Bnet Companion is written by Brandon McMullin, who claims no afiliation with Bungie Inc. " +
+				"Bnet Companion is a port of the Bungie Mobile app for Android and iPhone, and is distributed for free with the permission of Bungie Inc.")
+	);
+	
+};
+
+bcInterface.renderPrivacyPage = function() {
+	$("#bc-page-title").text("Privacy Policy");
+	
+	addBackButton('more');
+	
+	$("#bc-content").append(
+		div({id:'bc-privacy',cssClass:'scroll'})
+	);
+	
+	$("#bc-privacy").append(
+		p(null, "Bungie Browser stores basic information about your Bungie.net profile and your Twitter profile, should you choose to connect Bungie Browser to either of these services.") +
+		br()
+	);
+	
+	$("#bc-privacy").append(
+		p(null, "Bungie Browser does not log, compile, share, or otherwise send your personal information to others.") +
+		br()
+	);
+	
+	$("#bc-privacy").append(
+		p(null, "Use of some features, such as retweeting or replying to Tweets via Bungie Browser, should you choose to use these features, may indicate Bungie Browser as the source of the Tweet." +
+				"Per Twitter's functionality and design, your Twitter name may be exposed in any Tweet replys or Retweets to Tweets from Bungie Inc.")
+	);
+	
+	/*
+				<div id='bc-privacy' intName='Privacy Policy' class='scroll hidden'>
+				<p>
+					Bungie Browser stores basic information about your Bungie.net profile and your Twitter profile, should you choose to connect Bungie Browser to either of these services.
+				</p>
+				</br>
+				<p>
+					Bungie Browser does not log, compile, share, or otherwise send your personal information to others.
+				</p>
+				</br>
+				<p>
+					Use of some features, such as retweeting or replying to Tweets via Bungie Browser, should you choose to use these features, may indicate Bungie Browser as the source of the Tweet.
+					Per Twitter's functionality and design, your Twitter name may be exposed in any Tweet replys or Retweets to Tweets from Bungie Inc.
+				</p>
+			</div>
+	*/
+};
+
+bcInterface.renderTermsOfUse = function() {
+	$("#bc-page-title").text("Privacy Policy");
+	
+	addBackButton('more');
+	
+		$("#bc-content").append(
+		div({id:'bc-terms-of-use',cssClass:'scroll'})
+	);
+		
+	$("#bc-terms-of-use").append(
+		p(null, "Bungie, Bungie Mobile, Bungie.net, and all related assets such as images, brand names, and logos, are the sole property of Bungie Inc. " +
+				"Registered trademarked names, images, logos, and assets are used in accordance with Bungie Inc's rights and guidelines, with approval from Bungie.") +
+		br()
+	);
+	
+	$("#bc-terms-of-use").append(
+		p(null, "Bungie Browser is free of charge, and cannot be re-distributed for charge or donation.") +
+		br()
+	);	
+};
+
+bcInterface.renderSettings = function() {
+
+	$('#bc-page-title').text("Settings");
+
+	$("#bc-content").append(
+		div({id:'bc-settings',cssClass:'scroll'})
+	);
+	
+	$("#bc-settings").append(
+		p(null, "Connecting to Twitter helps ensure Bnet Companion can reliably retrieve Tweets from Bungie") +
+		br()
+	);
+	
+	if ( bnetClient.signedIntoTwitter() ) {
+		addSpanButton("bc-settings", 'bc-twitter-signout-btn', 'Disconnect from Twitter', function() {
+			bnetClient.twitterSignOut();
+		});	
+	} else {
+		addSpanButton("bc-settings", 'bc-twitter-signin-btn', 'Connect to Twitter', function() {
+			bnetClient.requestToken();
+		});	
+	}
+	
+	addBackButton('more');
+};
+
 bcInterface.selectIcon = function(link) {
 	var imgStr = "images/bnet.gif";
 	
@@ -183,6 +336,45 @@ bcInterface.selectIcon = function(link) {
 	}
 	return imgStr;
 }
+
+bcInterface.renderOnlineFriends = function() {
+	$("#bc-page-title").text('XBL Friends');
+	
+	addBackButton('profile');
+		
+	var friends = bnetClient.fetchFriendsOnline();
+	
+	if ( friends.length > 0 ) {
+	
+		$("#bc-content").append(
+			ul({id:'bc-friends-list',cssClass:'bc-news-list'})
+		);
+	
+		for ( var i in friends ) {
+			
+			var avatarImg = "http://avatar.xboxlive.com/avatar/" + friends[i].gamerTag + "/avatarpic-s.png";
+			var friendProfileLink = "http://www.bungie.net/Account/Profile.aspx?player=" + friends[i].gamerTag			
+			
+			var htmlString = li({cssClass:'bc-news-item',exref:friendProfileLink},
+				img(null, avatarImg) +
+				span({cssClass:'news-item-right'}, 
+					strong(null, ">")
+				) +
+				span({cssClass:'margin-left'}, friends[i].gamerTag) +
+				br() +
+				span({cssClass:'bc-minor-detail margin-left'}, friends[i].status)				
+			);
+			
+			$("#bc-friends-list").append(htmlString);
+			
+		}
+		
+		$(".bc-news-item").click(function() {
+			window.open($(this).attr('exref'));
+		});
+	}
+	
+};
 
 function elem(type, text, opts) {
 	var elemStr = "<" + type;
@@ -274,6 +466,25 @@ function addNavListButton(listId, buttonId, imgSrc, btnText, bottom, count, onCl
 	
 }
 
+function addSpanButton(targetId, btnId, buttonText, onClick) {
+
+	$("#" + targetId).append(
+		span({id:btnId,cssClass:'span-button'}, buttonText)
+	).show();
+	
+	$("#" + btnId).click(function() {
+		onClick();
+	});
+}
+
+function addBackButton(targetPage) {
+	$("#bc-content").append(span({cssClass:'bc-button', id:'bc-back-more'}, "< More")).show();
+	
+	$("#bc-back-more").click(function() {
+		bcInterface.renderSelectedView(targetPage);
+	});
+}
+
 $(document).ready(function() {
 	$('.bc-nav-item').click(function() {
 		$('.bc-nav-item').removeClass('bc-nav-active');
@@ -291,7 +502,7 @@ $(document).ready(function() {
 		bcInterface.openElemRef($(this));
 	});
 	
-	bcInterface.renderNewsFeed( bcInterface.debug ? bcInterface.mockNews : bnetClient.getNewsFeed() );
+	bcInterface.renderSelectedView('news');
 	
 	chrome.browserAction.setBadgeText({text: ''});
 

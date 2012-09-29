@@ -132,6 +132,10 @@ ul.bc-nav-list li {
 	padding: 5px;
 }
 
+ul.bc-nav-list li:hover {
+	background-color:#707070;
+}
+
 ul.bc-nav-list li img {
 	height: 24px;
 	width: 24px;
@@ -165,9 +169,13 @@ span.right strong {
 	border-bottom: 1px groove;
 }
 
-li.bc-minor-detail {
+.bc-minor-detail {
 	font-size: 0.8em;
 	color: gray;
+}
+
+.margin-left {
+	margin-left:5px;
 }
 
 span.span-button {
@@ -178,6 +186,10 @@ span.span-button {
 	border-radius: 3px;
 	color:white;
 	background-color: rgba(58,58,58,0.8);
+}
+
+span.span-button:hover {
+	background-color:#707070;
 }
 
 /* scrollbars */
@@ -302,6 +314,20 @@ li.bc-news-item img {
 	margin-top:10px;
 	float:left;
 }
+
+span.news-item-right {
+	color: #0096db;
+	font-size: 1.2em;
+	float: right;
+	text-align: right;
+	margin-right: 3px;
+	margin-top: 0.6em;
+}
+
+span.news-item-right strong {
+	color: #585858;
+}
+
 
 p.bc-news-details {
 	overflow:hidden;
