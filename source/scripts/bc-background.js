@@ -193,22 +193,24 @@ function BnetCompanion() {
 	this.updateOnlineFriendsCount = function() {
 		bnetProfile = JSON.parse(localStorage.bnetProfile);
 		
-		$.ajax({
-			url:"http://www.bungie.net/account/profile.aspx",
-			method:"GET",
-			dataType:"text",
-			async:false,
-			success:function(response) {
-				var doc = document.createElement('html');
-				doc.innerHTML = response;
+		if ( bnetProfile.signedIn ) {
+			$.ajax({
+				url:"http://www.bungie.net/account/profile.aspx",
+				method:"GET",
+				dataType:"text",
+				async:false,
+				success:function(response) {
+					var doc = document.createElement('html');
+					doc.innerHTML = response;
+					
+					var elem = $(doc).find('title')[0].text;
+					if ( elem.indexOf("Profile") > 0 ) {
+						extractXblFriendsOnline($(doc).find("#ctl00_dashboardNav_loggedInNormal"));
+					} 		
+				}
+			});	
+		}
 				
-				var elem = $(doc).find('title')[0].text;
-				if ( elem.indexOf("Profile") > 0 ) {
-					extractXblFriendsOnline($(doc).find("#ctl00_dashboardNav_loggedInNormal"));
-				} 		
-			}
-		});	
-		
 		localStorage.bnetProfile = JSON.stringify(bnetProfile);		
 	};
 	
