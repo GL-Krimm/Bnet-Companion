@@ -3,7 +3,8 @@ var bnetClient = new BnetCompanion();
 bnetClient.updateNews();
 var t = setInterval(bnetClient.updateNews, 30000);
 
-setInterval(bnetClient.updateOnlineFriendsCount(), 60 * 1000 * 5);
+setInterval(bnetClient.updateOnlineFriendsCount, 60 * 1000 * 5);
+
 
 function BnetCompanion() {
 
@@ -12,13 +13,21 @@ function BnetCompanion() {
 	}
 	arguments.callee._singletonInstance = this;
 	
+	var bnetProfile = {};
+	
+	if ( localStorage.bnetProfile ) {
+		bnetProfile = JSON.parse(localStorage.bnetProfile);
+	} else {
+		bnetProfile.signedIn = false;
+	}
+	
 	/* ============ "public" methods ================= */
 	this.getNewsFeed = function() {
 		return localStorage.newsFeed;
 	};
 	
 	this.getBnetProfile = function() {
-		return JSON.parse(localStorage.bnetProfile);
+		return bnetProfile;
 	};
 	
 	this.updateNews = function() {
@@ -31,8 +40,7 @@ function BnetCompanion() {
 			if ( latestPubDate > lastPubDate ) {
 				localStorage.lastPubDate = news[0].pubDate;
 				chrome.browserAction.setBadgeBackgroundColor({color:[0, 150, 219, 255]});
-				var token = "New";
-				chrome.browserAction.setBadgeText({text:token});
+				chrome.browserAction.setBadgeText({text:"New"});
 			}		
 		} else {
 			localStorage.lastPubDate = news[0].pubDate;
@@ -84,26 +92,21 @@ function BnetCompanion() {
 		$.ajax({
 			url:result.signed_url,
 			success:function(data) {
+			
+				var requestToken = null;
+				
 				data=data.split("&");
 				for (var i in data) {
 					var node = data[i].split("=");
 					
-					switch (node[0]) {
-						case "oauth_token" : {
-							localStorage.requestToken = node[1];
-						} break;
-						case "oauth_token_secret" : {
-							localStorage.requestTokenSecret = node[1];
-						} break;
-						default : {
-							//console.log("some other data: " + node[0]);
-						} break;
- 					}
+					if ( node[0] == "oauth_token" ) {
+						requestToken = node[1];
+					}
 					
 				}
-				if ( localStorage.requestToken ) {
+				if ( requestToken ) {
 					chrome.tabs.create({
-						url:"https://api.twitter.com/oauth/authorize?oauth_token=" + localStorage.requestToken
+						url:"https://api.twitter.com/oauth/authorize?oauth_token=" + requestToken
 					});
 				}
 				
@@ -114,8 +117,6 @@ function BnetCompanion() {
 	
 	this.twitterSignOut = function() {
 		window.localStorage.removeItem('accessToken');
-		window.localStorage.removeItem('requestToken');
-		window.localStorage.removeItem('requestTokenSecret');
 	};
 	
 	this.bnetSignOut = function() {
@@ -153,6 +154,7 @@ function BnetCompanion() {
 		});
 		
 		localStorage.bnetProfile = JSON.stringify(bnetProfile);
+		return bnetProfile.signedIn;
 	};
 	
 	this.fetchFriendsOnline = function() {
@@ -361,13 +363,10 @@ function BnetCompanion() {
 	
 	function extractUserName(elem) {	
 		bnetProfile.userName = $(elem).text();
-		localStorage.bnetUserName = bnetProfile.userName;
 	}
 	
 	function extractAvatar(elem) {;
 		bnetProfile.avatar = "http://www.bungie.net" + $(elem).attr('src');
-		localStorage.bnetAvatar = bnetProfile.avatar;
-		//console.log(localStorage.bnetAvatar);
 	}
 	
 	function extractBanner(elem) {
@@ -378,8 +377,6 @@ function BnetCompanion() {
 		bannerUrl = bannerUrl.split("images")[1];
 		bannerUrl = "http://www.bungie.net/images" + bannerUrl;
 		bnetProfile.bannerImg = bannerUrl.replace(")", "");
-		localStorage.bnetBanner = bnetProfile.bannerImg;
-		//console.log(localStorage.bnetBanner);
 	}
 	
 	function extractForumRank(elem) {
@@ -390,13 +387,10 @@ function BnetCompanion() {
 				bnetProfile.bnetRank = $(this).text();
 			}
 		});
-		localStorage.bnetRank = bnetProfile.bnetRank;
-		//console.log(localStorage.bnetRank );
 	}
 	
 	function extractLastActive(elem) {
 		bnetProfile.lastActive = elem.text();
-		localStorage.bnetLastActive = bnetProfile.lastActive;
 	}
 	
 	function extractMemberSince(elem) {
@@ -405,8 +399,6 @@ function BnetCompanion() {
 	
 	function extractGamerTag(elem) {
 		bnetProfile.gamerTag = elem.text().split(": ")[1];
-		localStorage.gamerTag = bnetProfile.gamerTag;
-		//console.log(bnetProfile.gamerTag);
 	}
 	
 	function extractXblFriendsOnline(elem) {
@@ -415,12 +407,8 @@ function BnetCompanion() {
 	
 	function extractNewMessageCount(elem) {
 		bnetProfile.messageCount = parseInt($(elem).find("li.messages").find('a').text());
-		localStorage.bnetMessageCount = bnetProfile.messageCount;
-		//console.log(bnetProfile.messageCount);
 	}
 	
-	var bnetProfile = {};
-	bnetProfile.signedIn = false;
 	var twitter = {};
 	twitter.consumerKey = "lwCCH94saDQSOqEcuGD7w";
 	twitter.consumerSecret = "Au2wXTBYyEyaDW2lv1jMDAtFj6aUhyRBxYf9h9YfA";	
