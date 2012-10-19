@@ -1,15 +1,6 @@
 var bnetClient = chrome.extension.getBackgroundPage().bnetClient;
 
 window.bcInterface = {};
-bcInterface.prevPageRef = 'news';
-
-bcInterface.debug = false;
-
-bcInterface.mockNews = new Array();
-bcInterface.mockNews.push({title:"Bungie - Your mome loves my air guitar move. IN SPACE!", pubDate:"July 19 2012", link:"http://www.bungie.net/blog.aspx?id=se7en"});
-bcInterface.mockNews.push({title:"Bungie - O Brave New World", pubDate:"July 7, 2012", link:"http://www.youtube.com/watch?o-brave-new-world"});
-bcInterface.mockNews.push({title:"@franklz glad to see Halo 4 is kicking ass, when will we get the beta?", pubDate:"July 7, 2007", link:"http://www.twitter.com/tweets/user/test/29rr9wrj"});
-bcInterface.mockNews = JSON.stringify(bcInterface.mockNews);
 
 bcInterface.rssUrl = "http://www.bungie.net/News/NewsRss.ashx";
 bcInterface.twitterFeedUrl = "http://api.twitter.com/1/statuses/user_timeline.rss?user_id=26280712&count=20"
@@ -28,7 +19,7 @@ bcInterface.renderSelectedView = function(pageId) {
 	
 	switch (pageId) {
 		case "news": {
-			bcInterface.renderNewsFeed( bcInterface.debug ? bcInterface.mockNews : bnetClient.getNewsFeed() );
+			bcInterface.renderNewsFeed( bnetClient.getNewsFeed() );
 		} break;
 		case "profile": {
 			bcInterface.renderProfile();
@@ -129,8 +120,7 @@ bcInterface.renderProfile = function() {
 	} else {
 	
 		$("#bc-content").prepend(
-			p( null, "Bnet Companion is not connected to Bungie.net. Sign into Bungie.net and allow Bnet Companion " +
-					 "to show profile information, such as online friends and new messages." )
+			p( null, bcResources.notBnetConnectedStr)
 		);
 		
 		addNavListButton('bc-profile-nav', 'bc-sign-in', 'images/power.png', 'Connect to Bnet', false, null, function() {
@@ -141,8 +131,7 @@ bcInterface.renderProfile = function() {
 		
 		$("#bc-content").append(
 			br() + 
-			p( null, "Bnet Companion will store some basic information from Bungie.net, but does not share or otherwise "+
-					 "expose this information to others. For more details, see the Privacy Policy from the More page." )
+			p( null, bcResources.privacyNotice )
 		);
 		
 	}
@@ -231,8 +220,7 @@ bcInterface.renderAboutPage = function() {
 	);
 	
 	$("#bc-about").append(
-		p(null, "Bnet Companion is written by Brandon McMullin, who claims no afiliation with Bungie Inc. " +
-				"Bnet Companion is a port of the Bungie Mobile app for Android and iPhone, and is distributed for free with the permission of Bungie Inc.")
+		p(null, bcResources.aboutAuthor)
 	);
 	
 };
@@ -247,36 +235,18 @@ bcInterface.renderPrivacyPage = function() {
 	);
 	
 	$("#bc-privacy").append(
-		p(null, "Bungie Browser stores basic information about your Bungie.net profile and your Twitter profile, should you choose to connect Bungie Browser to either of these services.") +
+		p(null, bcResources.dataStorageNotice) +
 		br()
 	);
 	
 	$("#bc-privacy").append(
-		p(null, "Bungie Browser does not log, compile, share, or otherwise send your personal information to others.") +
+		p(null, bcResources.privacyProtectionNotice) +
 		br()
 	);
 	
 	$("#bc-privacy").append(
-		p(null, "Use of some features, such as retweeting or replying to Tweets via Bungie Browser, should you choose to use these features, may indicate Bungie Browser as the source of the Tweet." +
-				"Per Twitter's functionality and design, your Twitter name may be exposed in any Tweet replys or Retweets to Tweets from Bungie Inc.")
+		p(null, bcResources.twitterNotice)
 	);
-	
-	/*
-				<div id='bc-privacy' intName='Privacy Policy' class='scroll hidden'>
-				<p>
-					Bungie Browser stores basic information about your Bungie.net profile and your Twitter profile, should you choose to connect Bungie Browser to either of these services.
-				</p>
-				</br>
-				<p>
-					Bungie Browser does not log, compile, share, or otherwise send your personal information to others.
-				</p>
-				</br>
-				<p>
-					Use of some features, such as retweeting or replying to Tweets via Bungie Browser, should you choose to use these features, may indicate Bungie Browser as the source of the Tweet.
-					Per Twitter's functionality and design, your Twitter name may be exposed in any Tweet replys or Retweets to Tweets from Bungie Inc.
-				</p>
-			</div>
-	*/
 };
 
 bcInterface.renderTermsOfUse = function() {
@@ -289,13 +259,12 @@ bcInterface.renderTermsOfUse = function() {
 	);
 		
 	$("#bc-terms-of-use").append(
-		p(null, "Bungie, Bungie Mobile, Bungie.net, and all related assets such as images, brand names, and logos, are the sole property of Bungie Inc. " +
-				"Registered trademarked names, images, logos, and assets are used in accordance with Bungie Inc's rights and guidelines, with approval from Bungie.") +
+		p(null, bcResources.copyRightNotice) +
 		br()
 	);
 	
 	$("#bc-terms-of-use").append(
-		p(null, "Bungie Browser is free of charge, and cannot be re-distributed for charge or donation.") +
+		p(null, bcResources.licensingNotice) +
 		br()
 	);	
 };
@@ -309,17 +278,19 @@ bcInterface.renderSettings = function() {
 	);
 	
 	$("#bc-settings").append(
-		p(null, "Connecting to Twitter helps ensure Bnet Companion can reliably retrieve Tweets from Bungie") +
+		p(null, bcResources.twitterConnectNotice) +
 		br()
 	);
 	
 	if ( bnetClient.signedIntoTwitter() ) {
 		addSpanButton("bc-settings", 'bc-twitter-signout-btn', 'Disconnect from Twitter', function() {
 			bnetClient.twitterSignOut();
+			bcInterface.renderSelectedView('settings');
 		});	
 	} else {
 		addSpanButton("bc-settings", 'bc-twitter-signin-btn', 'Connect to Twitter', function() {
 			bnetClient.requestToken();
+			bcInterface.renderSelectedView('settings');
 		});	
 	}
 	

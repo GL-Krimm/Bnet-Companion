@@ -129,7 +129,7 @@ function BnetCompanion() {
 	this.fetchBnetProfileData = function() {
 		$.ajax({
 			url:"http://www.bungie.net/account/profile.aspx",
-			method:"GET",
+			type:"GET",
 			dataType:"text",
 			async:false,
 			success:function(response) {
@@ -164,7 +164,7 @@ function BnetCompanion() {
 		
 		$.ajax({
 			url:"http://www.bungie.net/Stats/LiveFriends.aspx",
-			method:"GET",
+			type:"GET",
 			dataType:"text",
 			async:false,
 			success:function(response) {
@@ -198,7 +198,7 @@ function BnetCompanion() {
 		if ( bnetProfile.signedIn ) {
 			$.ajax({
 				url:"http://www.bungie.net/account/profile.aspx",
-				method:"GET",
+				type:"GET",
 				dataType:"text",
 				async:false,
 				success:function(response) {
@@ -269,7 +269,7 @@ function BnetCompanion() {
 		$.ajax({
 			url:result.signed_url,
 			dataType:"XML",
-			method:"GET",
+			type:"GET",
 			async:false,
 			success:function(data) {
 				//console.log("got something...");
@@ -285,7 +285,7 @@ function BnetCompanion() {
 		
 		$.ajax({
 			url:feedUrl,
-			method:"GET",
+			type:"GET",
 			async:false,
 			dataType:"XML",
 			success:function(data) {
@@ -302,7 +302,7 @@ function BnetCompanion() {
 
 		$.ajax({
 			url:"https://gdata.youtube.com/feeds/api/users/bungie/uploads?max-results=10",
-			method:"GET",
+			type:"GET",
 			async:false,
 			dataType:"XML",
 			success:function(data) {
