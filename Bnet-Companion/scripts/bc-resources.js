@@ -1,5 +1,7 @@
 var bcResources = {};
 
+bcResources.bnetSigninFailed = "Looks like you're not currently signed into Bungie.net. Click the button below to sign into Bungie.net, then please try again.";
+
 bcResources.notBnetConnectedStr = "Bnet Companion is not connected to Bungie.net. Sign into Bungie.net and allow Bnet Companion " +
 								  "to show profile information, such as online friends and new messages.";
 								  

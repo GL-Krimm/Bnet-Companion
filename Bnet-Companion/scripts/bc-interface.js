@@ -42,6 +42,9 @@ bcInterface.renderSelectedView = function(pageId) {
 		case "friends" : {
 			bcInterface.renderOnlineFriends();
 		} break;
+		case "signin" : {
+			bcInterface.renderSignInPage();
+		} break;
 		default:{
 			$('#bc-page-title').text($("#bc-" + pageId).attr('intName'));
 			$('#bc-' + pageId).show();
@@ -117,6 +120,8 @@ bcInterface.renderProfile = function() {
 			bcInterface.renderSelectedView("profile");
 		});
 		
+	} else if ( null != bcInterface.bnetSignedIn && bcInterface.bnetSignedIn == false ) {
+		bcInterface.renderSelectedView("signin");
 	} else {
 	
 		$("#bc-content").prepend(
@@ -124,7 +129,7 @@ bcInterface.renderProfile = function() {
 		);
 		
 		addNavListButton('bc-profile-nav', 'bc-sign-in', 'images/power.png', 'Connect to Bnet', false, null, function() {
-			bnetClient.fetchBnetProfileData();
+			bcInterface.bnetSignedIn = bnetClient.fetchBnetProfileData();
 			$(profileDivId).children().remove();
 			bcInterface.renderSelectedView("profile");
 		});
@@ -138,6 +143,28 @@ bcInterface.renderProfile = function() {
 	
 
 	$("#bc-profile").show();
+};
+
+bcInterface.renderSignInPage = function() {
+	
+	$("#bc-content").append(
+		div({id:"bc-sign-in",style:'display:none;text-align:left;'}, "")
+	);	
+
+	$("#bc-sign-in").append(
+		p( null, bcResources.bnetSigninFailed)
+	);
+	
+	$("#bc-sign-in").append(
+		ul({id:'bc-signin-nav', cssClass:'bc-nav-list'}, "")
+	);
+	
+	bcInterface.bnetSignedIn = null;
+	addNavListButton("bc-signin-nav", 'bc-sign-in-btn', 'images/bnet.gif', 'Go to Bnet', false, null, function() {
+		window.open('http://www.bungie.net');
+	});
+	
+	$("#bc-sign-in").show();
 };
 
 bcInterface.renderMorePage = function() {
