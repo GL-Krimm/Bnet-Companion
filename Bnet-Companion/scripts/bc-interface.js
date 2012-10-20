@@ -1,6 +1,7 @@
 var bnetClient = chrome.extension.getBackgroundPage().bnetClient;
 
 window.bcInterface = {};
+bcInterface.currentPage = "news";
 
 bcInterface.rssUrl = "http://www.bungie.net/News/NewsRss.ashx";
 bcInterface.twitterFeedUrl = "http://api.twitter.com/1/statuses/user_timeline.rss?user_id=26280712&count=20"
@@ -14,8 +15,23 @@ bcInterface.openElemRef = function(elem) {
 	}
 };
 
+bcInterface.renderView = function() {
+	console.log(bcInterface.currentPage);
+	bcInterface.renderSelectedView(bcInterface.currentPage);		
+};
+
 bcInterface.renderSelectedView = function(pageId) {
+	bcInterface.currentPage = pageId;
 	$('#bc-content').children().remove();
+	if ( !bnetClient.getWindowDetached() && $(".bc-popout-btn").length < 1 ) {
+		$("#bc-header").append(
+			img({cssClass:'bc-popout-btn'}, 'images/popout.png')
+		);
+		
+		$(".bc-popout-btn").click(function() {
+			bnetClient.openWindow();
+		});
+	}
 	
 	switch (pageId) {
 		case "news": {
@@ -44,6 +60,9 @@ bcInterface.renderSelectedView = function(pageId) {
 		} break;
 		case "signin" : {
 			bcInterface.renderSignInPage();
+		} break;
+		case "popout" : {
+			bnetClient.openWindow();
 		} break;
 		default:{
 			$('#bc-page-title').text($("#bc-" + pageId).attr('intName'));
@@ -238,7 +257,7 @@ bcInterface.renderNewsFeed = function(newsData) {
 }
 
 bcInterface.renderAboutPage = function() {
-	$("#bc-title").text("About");
+	$("#bc-page-title").text("About");
 
 	addBackButton('more');
 	
@@ -277,7 +296,7 @@ bcInterface.renderPrivacyPage = function() {
 };
 
 bcInterface.renderTermsOfUse = function() {
-	$("#bc-page-title").text("Privacy Policy");
+	$("#bc-page-title").text("Terms of Use");
 	
 	addBackButton('more');
 	
@@ -495,12 +514,21 @@ $(document).ready(function() {
 		bcInterface.renderSelectedView($(this).attr('intRef'));
 	});
 	
+	$(window).resize(function() {
+		window.resizeTo(297,456);
+	});
+	
+	$(window).unload(function() {
+		bnetClient.setDetachedWindow(false);
+	});
+	
 	$(".bc-button").click(function() {
 		console.log('got click');
 		bcInterface.openElemRef($(this));
 	});
 	
-	bcInterface.renderSelectedView('news');
+	bcInterface.renderView();
+	setInterval(bcInterface.renderView, 500);
 	
 	chrome.browserAction.setBadgeText({text: ''});
 

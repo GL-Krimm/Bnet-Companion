@@ -216,6 +216,22 @@ function BnetCompanion() {
 		localStorage.bnetProfile = JSON.stringify(bnetProfile);		
 	};
 	
+	this.openWindow = function() {
+		console.log('called');
+		try {
+			settings.windowDetached = true;
+			chrome.windows.create({'url':'bc-interface.html', 'type':'panel', 'height':455, 'width':296});
+		} catch ( e ) {
+			console.log(e.message);
+		}		
+	};
+	
+	this.setWindowDetached = function(value) {
+		settings.windowDetached = value;
+	};
+	this.getWindowDetached = function() {
+		return settings.windowDetached;
+	};
 	/* ============ "private" methods ================= */
 	function getNews() {
 		//console.log('getting news');
@@ -410,6 +426,8 @@ function BnetCompanion() {
 	}
 	
 	var twitter = {};
+	var settings = {};
+	settings.windowDetached = false;
 	twitter.consumerKey = "lwCCH94saDQSOqEcuGD7w";
 	twitter.consumerSecret = "Au2wXTBYyEyaDW2lv1jMDAtFj6aUhyRBxYf9h9YfA";	
 }

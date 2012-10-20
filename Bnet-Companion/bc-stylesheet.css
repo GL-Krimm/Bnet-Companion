@@ -26,6 +26,19 @@
 	border-bottom:1px groove;
 }
 
+.bc-popout-btn {
+	cursor: pointer;
+	padding: 2px;
+	position:fixed;
+	top:0.2em;
+	right:0.3em;
+}
+
+.bc-popout-btn:hover {
+	border-radius: 2px;
+	background-color: #000;
+}
+
 h1#bc-page-title {
 	padding:0;
 	margin:0;
@@ -52,7 +65,7 @@ span#bc-back-more:hover {
 
 #bc-content {
 	height:350px;
-	
+	overflow-x: hidden;
 	/* 
 	   controls the size of the stripes and their offset; they have to be
 	   coordinated a certain way to ensure smooth lines
