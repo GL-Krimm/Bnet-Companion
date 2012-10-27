@@ -229,16 +229,8 @@ function BnetCompanion() {
 		
 		news = getFeedXml("http://www.bungie.net/News/NewsRss.ashx");
 		
-		var bungieUrl = "http";
+		news = news.concat(getTwitterFeed());
 		
-		if ( localStorage.accessToken ) {
-			//console.log("Getting authed bungie feed");
-			news = news.concat(getTwitterFeed());
-		} else {
-			//console.log("Getting unauthed bungie feed");
-			news = news.concat(getFeedXml("http://api.twitter.com/1/statuses/user_timeline.rss?user_id=26280712&count=40"));
-		}
-				
 		news = news.concat(getYoutubeFeed());	
 		
 		news = sortFeed(news);
@@ -254,33 +246,50 @@ function BnetCompanion() {
 	
 	function getTwitterFeed() {
 		var feedData = new Array();
-	
-		var result = OAuthSimple().sign({
-			action:"GET",
-			method:"HMAC-SHA1",
-			dataType:"XML",
-			path:"https://api.twitter.com/1/statuses/user_timeline.rss?user_id=26280712&count=40",
-			parameters:{
-				oauth_version:"1.0",
-				oauth_signature_method:"HMAC-SHA1",
-				oauth_callback:window.top.location
-			},
-			signatures:{
-				consumer_key:twitter.consumerKey,
-				shared_secret:twitter.consumerSecret,
-				auth_token:localStorage.accessToken
-			}
-		});
+		var request = null;
+		var twitterUrl = "http://api.twitter.com/1/statuses/user_timeline.json?user_id=26280712&count=40";
+		
+		if ( localStorage.accessToken ) {
+			request = OAuthSimple().sign({
+				action:"GET",
+				method:"HMAC-SHA1",
+				dataType:"JSON",
+				path:"https://api.twitter.com/1/statuses/user_timeline.json?user_id=26280712&count=40",
+				parameters:{
+					oauth_version:"1.0",
+					oauth_signature_method:"HMAC-SHA1",
+					oauth_callback:window.top.location
+				},
+				signatures:{
+					consumer_key:twitter.consumerKey,
+					shared_secret:twitter.consumerSecret,
+					auth_token:localStorage.accessToken
+				}
+			});
+		} else {
+			request = {};
+			request.url = twitterUrl;
+			request.dataType = 'JSON';
+		}
 		
 		$.ajax({
-			url:result.signed_url,
-			dataType:"XML",
+			url:request.signed_url || request.url,
+			dataType:request.dataType, //"JSON",
 			type:"GET",
 			async:false,
 			success:function(data) {
 				//console.log("got something...");
-				//console.log(data);
-				feedData = processXmlData(data);		
+				console.log(data);
+				//feedData = processXmlData(data);
+				for ( var i = 0; i < data.length; i++ ) {
+					var item = {};
+					item.pubDate = data[i].created_at;
+					item.title = data[i].text;
+					item.link = "http://twitter.com/bungie/statuses/" + data[i].id;
+					
+					feedData.push(item);
+					console.log(item);
+				}
 			}
 		});
 		return feedData;
