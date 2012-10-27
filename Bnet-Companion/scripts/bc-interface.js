@@ -1,6 +1,7 @@
 var bnetClient = chrome.extension.getBackgroundPage().bnetClient;
 
 window.bcInterface = {};
+bcInterface.isWindowDetached = false;
 bcInterface.currentPage = "news";
 
 bcInterface.rssUrl = "http://www.bungie.net/News/NewsRss.ashx";
@@ -23,19 +24,19 @@ bcInterface.renderView = function() {
 bcInterface.renderSelectedView = function(pageId) {
 	bcInterface.currentPage = pageId;
 	$('#bc-content').children().remove();
-	if ( !bnetClient.getWindowDetached() && $(".bc-popout-btn").length < 1 ) {
+	if ( !bcInterface.isWindowDetached && $(".bc-popout-btn").length < 1 ) {
 		$("#bc-header").append(
 			img({cssClass:'bc-popout-btn'}, 'images/popout.png')
 		);
 		
 		$(".bc-popout-btn").click(function() {
-			bnetClient.openWindow();
+			chrome.windows.create({'url':'bc-interface.html?detached=true', 'type':'panel', 'height':455, 'width':296});
 		});
 	}
 	
 	switch (pageId) {
 		case "news": {
-			bcInterface.renderNewsFeed( bnetClient.getNewsFeed() );
+			bcInterface.renderNewsPage();
 		} break;
 		case "profile": {
 			bcInterface.renderProfile();
@@ -221,14 +222,29 @@ bcInterface.renderMorePage = function() {
 	$("#bc-more").show();
 };
 
-bcInterface.renderNewsFeed = function(newsData) {
+bcInterface.renderNewsPage = function() {
 	$("#bc-page-title").text("Bungie News");
 		
 	$("#bc-content").append(
 		ul({id:'bc-news',cssClass:'bc-news-list'})
 	);
+
+	bcInterface.renderNewsFeed();
 	
-	newsData = JSON.parse(newsData);
+};
+
+bcInterface.updateNewsFeed - function() {	
+	if ( ( bcInterface.currentPage == 'news' ) && bnetClient.hasNewContent() ) {
+		bcInterface.renderNewsFeed();
+	}
+};
+
+bcInterface.renderNewsFeed = function() {
+
+	$("#bc-news").children().remove();
+
+	var newsData =  JSON.parse(bnetClient.getNewsFeed());
+		
 	for ( var i = 0; i < newsData.length; i++ )
 	{
 		var title = newsData[i].title;
@@ -288,10 +304,6 @@ bcInterface.renderPrivacyPage = function() {
 	$("#bc-privacy").append(
 		p(null, bcResources.privacyProtectionNotice) +
 		br()
-	);
-	
-	$("#bc-privacy").append(
-		p(null, bcResources.twitterNotice)
 	);
 };
 
@@ -518,17 +530,16 @@ $(document).ready(function() {
 		window.resizeTo(297,456);
 	});
 	
-	$(window).unload(function() {
-		bnetClient.setDetachedWindow(false);
-	});
-	
 	$(".bc-button").click(function() {
-		console.log('got click');
 		bcInterface.openElemRef($(this));
 	});
 	
+	if ( window.location.href.indexOf('detached') > -1 ) {
+		bcInterface.isWindowDetached = true;
+	}
+	
 	bcInterface.renderView();
-	setInterval(bcInterface.renderView, 500);
+	setInterval(bcInterface.updateNewsFeed, 500);
 	
 	chrome.browserAction.setBadgeText({text: ''});
 

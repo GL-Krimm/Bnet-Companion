@@ -38,6 +38,7 @@ function BnetCompanion() {
 			var lastPubDate = new Date(localStorage.lastPubDate);
 					
 			if ( latestPubDate > lastPubDate ) {
+				settings.newContentFound = true;
 				localStorage.lastPubDate = news[0].pubDate;
 				chrome.browserAction.setBadgeBackgroundColor({color:[0, 150, 219, 255]});
 				chrome.browserAction.setBadgeText({text:"New"});
@@ -47,6 +48,10 @@ function BnetCompanion() {
 		}
 		
 		//console.log('updated news');	
+	};
+	
+	this.hasNewContent = function() {
+		return settings.newContentFound;
 	};
 	
 	this.setAccessToken = function(token) {
@@ -216,23 +221,8 @@ function BnetCompanion() {
 		localStorage.bnetProfile = JSON.stringify(bnetProfile);		
 	};
 	
-	this.openWindow = function() {
-		console.log('called');
-		try {
-			settings.windowDetached = true;
-			chrome.windows.create({'url':'bc-interface.html', 'type':'panel', 'height':455, 'width':296});
-		} catch ( e ) {
-			console.log(e.message);
-		}		
-	};
-	
-	this.setWindowDetached = function(value) {
-		settings.windowDetached = value;
-	};
-	this.getWindowDetached = function() {
-		return settings.windowDetached;
-	};
 	/* ============ "private" methods ================= */
+	
 	function getNews() {
 		//console.log('getting news');
 		var news = new Array();
@@ -427,7 +417,7 @@ function BnetCompanion() {
 	
 	var twitter = {};
 	var settings = {};
-	settings.windowDetached = false;
+	settings.newContentFound = false;
 	twitter.consumerKey = "lwCCH94saDQSOqEcuGD7w";
 	twitter.consumerSecret = "Au2wXTBYyEyaDW2lv1jMDAtFj6aUhyRBxYf9h9YfA";	
 }
