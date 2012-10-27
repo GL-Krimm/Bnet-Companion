@@ -74,8 +74,8 @@ span#bc-back-more:hover {
 	/* 
 	   sets up the actual lines being used to create the pinstriping effect
 	*/
-    background-image: -webkit-linear-gradient(-45deg, rgba(255, 255, 255, .2) 25%, transparent 25%,
-								transparent 50%, rgba(255, 255, 255, .2) 50%, rgba(255, 255, 255, .2) 75%,
+    background-image: -webkit-linear-gradient(-45deg, rgba(65, 65, 66, .2) 25%, transparent 25%,
+								transparent 50%, rgba(65, 65, 66, .2) 50%, rgba(65, 65, 66, .2) 75%,
 								transparent 75%, transparent);
 								
 
