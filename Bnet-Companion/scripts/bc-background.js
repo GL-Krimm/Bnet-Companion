@@ -285,7 +285,7 @@ function BnetCompanion() {
 					var item = {};
 					item.pubDate = data[i].created_at;
 					item.title = data[i].text;
-					item.link = "http://twitter.com/bungie/statuses/" + data[i].id;
+					item.link = "http://twitter.com/bungie/statuses/" + data[i].id_str;
 					
 					feedData.push(item);
 					console.log(item);
