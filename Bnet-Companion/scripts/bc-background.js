@@ -128,7 +128,6 @@ function BnetCompanion() {
 		bnetProfile = {};
 		bnetProfile.signedIn = false;
 		localStorage.bnetProfile = JSON.stringify(bnetProfile);
-		console.log("logging out");
 	};
 	
 	this.fetchBnetProfileData = function() {
@@ -278,9 +277,6 @@ function BnetCompanion() {
 			type:"GET",
 			async:false,
 			success:function(data) {
-				//console.log("got something...");
-				console.log(data);
-				//feedData = processXmlData(data);
 				for ( var i = 0; i < data.length; i++ ) {
 					var item = {};
 					item.pubDate = data[i].created_at;
@@ -288,7 +284,6 @@ function BnetCompanion() {
 					item.link = "http://twitter.com/bungie/statuses/" + data[i].id_str;
 					
 					feedData.push(item);
-					console.log(item);
 				}
 			}
 		});

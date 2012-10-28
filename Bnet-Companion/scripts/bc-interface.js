@@ -17,7 +17,7 @@ bcInterface.openElemRef = function(elem) {
 };
 
 bcInterface.renderView = function() {
-	console.log(bcInterface.currentPage);
+	//console.log(bcInterface.currentPage);
 	bcInterface.renderSelectedView(bcInterface.currentPage);		
 };
 
