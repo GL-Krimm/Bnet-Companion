@@ -3,6 +3,7 @@ var bnetClient = chrome.extension.getBackgroundPage().bnetClient;
 window.bcInterface = {};
 bcInterface.isWindowDetached = false;
 bcInterface.currentPage = "news";
+bcInterface.showPopoutBtn = true;
 
 bcInterface.rssUrl = "http://www.bungie.net/News/NewsRss.ashx";
 bcInterface.twitterFeedUrl = "http://api.twitter.com/1/statuses/user_timeline.rss?user_id=26280712&count=20"
@@ -17,14 +18,13 @@ bcInterface.openElemRef = function(elem) {
 };
 
 bcInterface.renderView = function() {
-	//console.log(bcInterface.currentPage);
 	bcInterface.renderSelectedView(bcInterface.currentPage);		
 };
 
 bcInterface.renderSelectedView = function(pageId) {
 	bcInterface.currentPage = pageId;
 	$('#bc-content').children().remove();
-	if ( !bcInterface.isWindowDetached && $(".bc-popout-btn").length < 1 ) {
+	if ( bcInterface.showPopoutBtn && !bcInterface.isWindowDetached && $(".bc-popout-btn").length < 1 ) {
 		$("#bc-header").append(
 			img({cssClass:'bc-popout-btn'}, 'images/popout.png')
 		);
@@ -352,6 +352,19 @@ bcInterface.renderSettings = function() {
 		});	
 	}
 	
+	$("#bc-settings").append(
+		br() + br() + span(null, "Play notification sounds?&nbsp") +
+		"<input type='checkbox' id='bc-play-sound-chk' />"
+	);
+	
+	if ( bnetClient.getPreference('playNotifications') == true ) {
+		$('#bc-play-sound-chk').attr('checked','checked');
+	}
+	
+	$("#bc-play-sound-chk").bind('change', function() {
+		bnetClient.setPreference('playNotifications', $(this).is(':checked'));
+	});
+	
 	addBackButton('more');
 };
 
@@ -525,6 +538,10 @@ $(document).ready(function() {
 	
 		bcInterface.renderSelectedView($(this).attr('intRef'));
 	});
+	
+	if ( navigator.userAgent.indexOf('Windows NT 6.2') > -1 ) {
+		bcInterface.showPopoutBtn = false;
+	}
 	
 	$(window).resize(function() {
 		window.resizeTo(297,456);

@@ -14,11 +14,19 @@ function BnetCompanion() {
 	arguments.callee._singletonInstance = this;
 	
 	var bnetProfile = {};
+	var settings = {};
 	
 	if ( localStorage.bnetProfile ) {
 		bnetProfile = JSON.parse(localStorage.bnetProfile);
 	} else {
 		bnetProfile.signedIn = false;
+	}
+	
+	if ( localStorage.settings ) {
+		settings = JSON.parse(localStorage.settings);
+	} else {
+		settings.newContentFound = false;
+		settings.playNotifications = true;
 	}
 	
 	/* ============ "public" methods ================= */
@@ -39,19 +47,30 @@ function BnetCompanion() {
 					
 			if ( latestPubDate > lastPubDate ) {
 				settings.newContentFound = true;
+				settings.notificationPlayed = false;
 				localStorage.lastPubDate = news[0].pubDate;
 				chrome.browserAction.setBadgeBackgroundColor({color:[0, 150, 219, 255]});
 				chrome.browserAction.setBadgeText({text:"New"});
 			}		
+			
+			// play the sound notification, if enabled, once per new update detected.
+			if ( ( settings.playNotifications ) && settings.newContentFound && !settings.notificationPlayed ) {
+				$("#bc-notification")[0].play();
+				settings.notificationPlayed = true;
+			}
+			
 		} else {
 			localStorage.lastPubDate = news[0].pubDate;
 		}
 		
-		//console.log('updated news');	
 	};
 	
 	this.hasNewContent = function() {
 		return settings.newContentFound;
+	};
+	
+	this.setHasNewContent = function(value) {
+		settings.newContentFound = value;
 	};
 	
 	this.setAccessToken = function(token) {
@@ -59,7 +78,7 @@ function BnetCompanion() {
 	};
 	
 	this.signedIntoTwitter = function() {
-		//console.log("checking if signed in: " + localStorage.accessToken);
+	
 		var signedIn = false;
 		
 		if ( null != localStorage.accessToken && localStorage.accessToken.length > 0 ) {
@@ -68,13 +87,8 @@ function BnetCompanion() {
 		
 		return signedIn;
 	};
-	
-	this.log = function(msg) {
-		//console.log(msg);
-	};
-	
+		
 	this.requestToken = function() {
-		//console.log("requesting token...");
 		var callbackString = window.top.location + "?t=" + Date.now();
 		var result = OAuthSimple().sign({
 			action:"GET",
@@ -91,8 +105,6 @@ function BnetCompanion() {
 				shared_secret:twitter.consumerSecret
 			}
 		});
-		
-		//console.log(result.signed_url);
 		
 		$.ajax({
 			url:result.signed_url,
@@ -220,10 +232,19 @@ function BnetCompanion() {
 		localStorage.bnetProfile = JSON.stringify(bnetProfile);		
 	};
 	
+	this.setPreference = function(key, val) {
+		settings[key] = val;
+		localStorage.settings = JSON.stringify(settings);
+	};
+	
+	this.getPreference = function(key) {
+		return settings[key];
+	};
+	
 	/* ============ "private" methods ================= */
 	
 	function getNews() {
-		//console.log('getting news');
+	
 		var news = new Array();
 		
 		news = getFeedXml("http://www.bungie.net/News/NewsRss.ashx");
@@ -299,8 +320,6 @@ function BnetCompanion() {
 			async:false,
 			dataType:"XML",
 			success:function(data) {
-				//console.log("got something...");
-				//console.log(data);
 				feedData = processXmlData(data);
 			}
 		});
@@ -359,7 +378,7 @@ function BnetCompanion() {
 	
 	function processXmlData(data) {
 		var feedData = new Array();
-		//console.log(data.toString());
+		
 		$($(data).find('item')).each(function() {
 						
 			var item = {};
@@ -391,7 +410,7 @@ function BnetCompanion() {
 	
 	function extractForumRank(elem) {
 		var ulElem = $(elem).find('ul');
-		//console.log(ulElem);
+		
 		$(ulElem).find('li').each(function() {
 			if ( $(this).children().length == 0 ) {
 				bnetProfile.bnetRank = $(this).text();
@@ -420,29 +439,27 @@ function BnetCompanion() {
 	}
 	
 	var twitter = {};
-	var settings = {};
-	settings.newContentFound = false;
 	twitter.consumerKey = "lwCCH94saDQSOqEcuGD7w";
 	twitter.consumerSecret = "Au2wXTBYyEyaDW2lv1jMDAtFj6aUhyRBxYf9h9YfA";	
 }
 
 $(document).ready(function() {
-	bnetClient.log("init...");
-	bnetClient.log(window.location.href);
+	
 	var d = window.location.href.split("?");
 	if (d[1]) {
 		d = d[1].split("&");
 		for ( var i in d ) {
 			var c = d[i].split("=");
 			if ( c[0] == "oauth_token" ) {
-				bnetClient.log("got auth token");
-				bnetClient.log(c[1]);
-				bnetClient.setAccessToken(c[1]);
+				localStorage.accessToken = c[1];
 				bnetClient.log(localStorage.accessToken);
 			}
 		}
-		window.open('', '_self', ''); //bug fix
-		window.close();
+		window.open('', '_self', ''); //gets a handle on the background page when opened by omniauth callback...
+		window.close(); //then closes it
+	} else {
+		$('body').append("<audio id='bc-notification' src='sounds/notification.mp3' type='audio/mp3'></audio>");
 	}
+	
 });
 
